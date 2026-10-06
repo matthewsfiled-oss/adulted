@@ -38,6 +38,11 @@
       ]
     ],
     "scheme": "adulted",
-    "owner": "matthewsfiled"
+    "owner": "matthewsfiled",
+    "extra": {
+      "eas": {
+        "projectId": "1ef21ceb-0138-4a05-ac39-4245a9f89c0a"
+      }
+    }
   }
 }
