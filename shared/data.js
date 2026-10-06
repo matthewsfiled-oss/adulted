@@ -12,6 +12,7 @@
     goldMonthly: 14.99, goldYearly: 119.99,
     studentSilverYearly: 29.99, familyGoldYearly: 179.99,
     askPerDay: { free: 3, silver: 30, gold: 200 },
+    snapPerDay: { free: 2, silver: 20, gold: 100 }, // free gets 2 a day during the beta, before paid plans open
     supportEmail: "matthewsfiled@gmail.com",
     siteUrl: "https://adulted.onrender.com",
   };
@@ -19,9 +20,9 @@
   /* What each plan includes. live:false means it's on the roadmap, shown as "Coming soon". */
   const TIERS = [
     { id: "free", n: "Free", price: "$0", note: "Everything you need to get through the day",
-      has: [["Every step-by-step guide with pictures", true], ["Panic button and emergency help", true], ["First Apartment checklist", true], ["3 Ask Anything questions a day", true], ["Benefits Finder and Resource Directory", false], ["Meal Library and shopping lists", false]] },
+      has: [["Every step-by-step guide with pictures", true], ["Panic button and emergency help", true], ["First Apartment checklist", true], ["3 Ask Anything questions a day", true], ["2 Snap and Solve photos a day (beta)", true], ["Benefits Finder and Resource Directory", false], ["Meal Library and shopping lists", false]] },
     { id: "silver", n: "Silver", price: "$6.99/mo", alt: "or $49.99/yr", note: "For running your life without the guesswork",
-      has: [["Everything in Free", true], ["30 Ask Anything questions a day", true], ["Snap and Solve (photo help)", false], ["Document vault with renewal reminders", false], ["Full State Move Planner", false], ["Bill Check and homeownership tools", false]] },
+      has: [["Everything in Free", true], ["30 Ask Anything questions a day", true], ["Snap and Solve: 20 photos a day", true], ["Document vault with renewal reminders", false], ["Full State Move Planner", false], ["Bill Check and homeownership tools", false]] },
     { id: "gold", n: "Gold", price: "$14.99/mo", alt: "or $119.99/yr", note: "The app handles the hard parts for you",
       has: [["Everything in Silver", true], ["Unlimited Ask Anything", true], ["Document Explainer for leases and contracts", false], ["Bank Link and Leak Finder", false], ["Book It For Me with no success fee", false], ["Doctor wait times and AI office calls", false]] },
   ];

@@ -11,7 +11,9 @@
       "supportsTablet": false,
       "bundleIdentifier": "com.matthewsfiled.adulted",
       "infoPlist": {
-        "ITSAppUsesNonExemptEncryption": false
+        "ITSAppUsesNonExemptEncryption": false,
+        "NSCameraUsageDescription": "Adulted uses the camera so you can snap a photo of an appliance or label and get steps for your exact one.",
+        "NSPhotoLibraryUsageDescription": "Adulted lets you choose a photo of an appliance or label to get steps for it."
       }
     },
     "android": {
@@ -24,6 +26,9 @@
       "package": "com.matthewsfiled.adulted",
       "blockedPermissions": [
         "com.google.android.gms.permission.AD_ID"
+      ],
+      "permissions": [
+        "CAMERA"
       ]
     },
     "plugins": [

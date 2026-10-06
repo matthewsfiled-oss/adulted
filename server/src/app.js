@@ -24,14 +24,14 @@ const safeEqual = (a, b) => {
 };
 
 // How often one person can use each AI feature (per 10 minutes), and how long the answer can be.
-const AI_LIMITS = { ask: 20 };
-const MAX_TOKENS = { ask: 1200 };
+const AI_LIMITS = { ask: 20, snap: 10 };
+const MAX_TOKENS = { ask: 1200, snap: 1500 };
 const SYSTEM = "You are Adulted's life-skills helper for young adults living on their own for the first time in the U.S. Give accurate, safe, practical help in plain language. Put safety first: for emergencies tell people to call 911, and for thoughts of suicide or self-harm share the 988 Suicide and Crisis Lifeline (call or text 988). Follow the requested format exactly.";
 
 /**
  * Build the whole service: landing page (/), web app (/app), API (/api).
  * `client` is an Anthropic SDK client (or a fake in tests).
- * Nothing people type is stored or logged: it goes to Claude and is dropped.
+ * Nothing people type or photograph is stored or logged: it goes to Claude and is dropped.
  */
 function createApp({
   client, models, adminKey = '', waitlist, reports, corsOrigin = true, dailyAiLimit = 1000,
@@ -53,7 +53,10 @@ function createApp({
     crossOriginEmbedderPolicy: false,
   }));
   app.use('/api', cors({ origin: corsOrigin }));
-  app.use(express.json({ limit: '64kb' }));
+  // Photos for Snap and Solve need room; everything else stays small.
+  const smallJson = express.json({ limit: '64kb' });
+  const photoJson = express.json({ limit: '5mb' });
+  app.use((req, res, next) => (req.path === '/api/ai/snap' ? photoJson : smallJson)(req, res, next));
 
   // Log the route and timing only. Never log bodies: they can include personal details.
   app.use((req, res, next) => {
@@ -86,7 +89,7 @@ function createApp({
             model: models[task.tier] || models.main,
             max_tokens: MAX_TOKENS[kind] || 1200,
             system: SYSTEM,
-            messages: [{ role: 'user', content: task.prompt(input) }],
+            messages: [{ role: 'user', content: task.content ? task.content(input) : task.prompt(input) }],
           });
           const text = (reply.content || []).filter((b) => b.type === 'text').map((b) => b.text).join('').trim();
           if (!text) throw new HttpError(502, 'ai_unavailable');

@@ -4,7 +4,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const FEATURES = ['ask'];
+const FEATURES = ['ask', 'snap'];
 const REASONS = ['wrong', 'unsafe', 'kids', 'other'];
 const KEEP_DAYS = 365;
 const clip = (v, n) => String(v == null ? '' : v).replace(/\u0000/g, '').trim().slice(0, n);

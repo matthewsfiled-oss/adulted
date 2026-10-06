@@ -56,6 +56,36 @@ test('ask returns a cleaned answer, sends only known profile fields, and uses th
   });
 });
 
+const PHOTO = 'data:image/jpeg;base64,' + Buffer.from('fake-jpeg-bytes').toString('base64');
+
+test('snap sends the photo to Claude as an image and cleans marker positions', async () => {
+  const client = fakeClient([{ what: 'Front-loading washer', brand: 'LG', model: '', sure: true, summary: 'Use Normal and Cold.',
+    steps: [{ t: 'Turn the dial to Normal', d: 'Big dial on the left.', x: 22, y: 140 }, { t: 'Press Start', d: 'Bottom right.', x: null, y: null }],
+    safety: '', retake: '', manual: 'LG WM3400 manual' }]);
+  await withServer(createApp({ client, models }), async (base) => {
+    const res = await post(base, '/api/ai/snap', { image: PHOTO, target: 'laundry', goal: 'wash towels' });
+    assert.equal(res.status, 200);
+    const { result } = await res.json();
+    assert.equal(result.brand, 'LG');
+    assert.deepEqual(result.steps.map((s) => [s.x, s.y]), [[22, 100], [null, null]]);
+    const content = client.calls[0].messages[0].content;
+    assert.equal(content[0].type, 'image');
+    assert.equal(content[0].source.media_type, 'image/jpeg');
+    assert.match(content[1].text, /washing machine controls/);
+    assert.match(content[1].text, /wash towels/);
+  });
+});
+
+test('snap refuses anything that is not a photo, and big bodies only work for photos', async () => {
+  const client = fakeClient([]);
+  await withServer(createApp({ client, models }), async (base) => {
+    assert.equal((await post(base, '/api/ai/snap', { image: 'data:text/html;base64,PGI+' })).status, 400);
+    assert.equal((await post(base, '/api/ai/snap', { image: 'https://example.com/x.jpg' })).status, 400);
+    assert.equal((await post(base, '/api/ai/ask', { q: 'x'.repeat(100000) })).status, 413);
+    assert.equal(client.calls.length, 0);
+  });
+});
+
 test('bad input is refused before calling Claude, and only Adulted tasks exist', async () => {
   const client = fakeClient([]);
   await withServer(createApp({ client, models }), async (base) => {

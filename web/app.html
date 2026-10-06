@@ -77,6 +77,14 @@ p{margin:0}
 .stand .bar span{display:block;height:100%;background:var(--amber)}
 .stand .bar b{position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:15px}
 .stand .src{font-size:12.5px;color:var(--muted)}
+.snap-promo{display:grid;grid-template-columns:auto minmax(0,1fr);gap:12px;align-items:center;background:var(--blue-soft);border:2px solid var(--blue);border-radius:14px;padding:12px 14px;text-decoration:none;color:var(--ink)}
+.snap-promo .ic{width:46px;height:46px;border-radius:12px;background:var(--blue);color:#fff;display:grid;place-items:center}
+.snap-promo b{display:block}
+.snap-pick{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.snap-img{display:block;width:100%;border-radius:12px;border:2px solid var(--ink)}
+.snap-marked{position:relative;border-radius:12px;overflow:hidden;border:2.5px solid var(--ink)}
+.snap-marked img{display:block;width:100%}
+.snap-marked .mark{position:absolute;transform:translate(-50%,-50%);width:34px;height:34px;border-radius:50%;background:var(--amber);border:3px solid var(--ink);display:grid;place-items:center;font-family:var(--display);font-weight:800;font-size:16px;box-shadow:0 0 0 3px #fff}
 .tip{background:var(--amber-soft);border-left:6px solid var(--amber);border-radius:4px 12px 12px 4px;padding:14px 16px;display:flex;gap:12px;align-items:flex-start}
 .tip b{display:block;font-size:14px;color:var(--amber-ink)}
 
@@ -234,6 +242,7 @@ const ICONS = {
   car:'<path d="M3 16v-4l2-5h14l2 5v4z"/><circle cx="7.5" cy="16.5" r="2"/><circle cx="16.5" cy="16.5" r="2"/>',
   bulb:'<path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-4 10.5c1 1 1 2 1 2.5h6c0-.5 0-1.5 1-2.5A6 6 0 0 0 12 3"/>',
   list:'<path d="M9 6h11M9 12h11M9 18h11"/><path d="m3 6 1.5 1.5L7 5M3 12l1.5 1.5L7 11M3 18l1.5 1.5L7 17"/>',
+  camera:'<path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/>',
   lock:'<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/>',
 };
 const ico = (n, s = 22, w = 2.2) => `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[n] || ""}</svg>`;
@@ -398,6 +407,7 @@ function guideView(id){
     <div class="chips"><span class="chip ${cls}">${esc(lvl)}</span><span class="chip">${esc(g.time)}</span><span class="chip">${n} steps</span></div>
     ${g.tools.length ? `<p class="tools"><b style="color:var(--ink)">You'll need:</b> ${g.tools.map(esc).join(", ")}</p>` : ""}
     ${g.safety ? `<div class="warn${g.level === 3 ? " red" : ""}">${ico("sos", 20)}<span>${esc(g.safety)}</span></div>` : ""}
+    ${SNAP[snapTargetFor(id)] && snapTargetFor(id) !== "other" ? snapPromo(snapTargetFor(id)) : ""}
   </section>
   <div class="deck" id="deck" tabindex="0" aria-label="Steps, swipe to go through them">${g.steps.map((st, i) => `
     <article class="step" aria-label="Step ${i + 1} of ${n}">
@@ -425,13 +435,96 @@ function guideView(id){
   $("#askMore").addEventListener("click", () => store.set("draft", `${g.n}: `));
 }
 
+/* ---------- Snap and Solve: a photo of your own machine, steps for that exact machine ---------- */
+const SNAP = {
+  laundry: ["washer", "How do I wash a normal load on this washer?"], dryer: ["dryer", "How do I dry a normal load on this dryer?"],
+  labels: ["clothing tag", "How should I wash and dry this?"], disposal: ["disposal", "It hums but won't spin. How do I fix it?"],
+  breaker: ["breaker panel", "Which breaker do I reset, and how?"], smoke: ["alarm", "It's chirping. How do I change the battery?"],
+  shutoff: ["valve", "How do I turn the water off here?"], toilet: ["toilet", "It's clogged. What do I do?"], other: ["thing", ""],
+};
+const snapTargetFor = (id) => (id === "outage" ? "breaker" : SNAP[id] ? id : "other");
+function snapsLeft(){ const u = store.get("snaps", { day: "", n: 0 }); return Math.max(0, CONFIG.snapPerDay[tier()] - (u.day === todayStr() ? u.n : 0)); }
+function useSnap(){ const t = todayStr(), u = store.get("snaps", { day: t, n: 0 }); store.set("snaps", { day: t, n: (u.day === t ? u.n : 0) + 1 }); }
+const snapPromo = (t) => `<a class="snap-promo" href="#snap-${t}"><span class="ic">${ico("camera", 26)}</span><span><b>Every ${esc(SNAP[t][0])} is different</b><span class="small">Snap a photo of yours and get steps for your exact one.</span></span></a>`;
+// Shrink a photo to at most 1280px on the long side so it uploads fast on a phone connection.
+function shrinkPhoto(file){
+  return new Promise((resolve, reject) => {
+    const img = new Image(), url = URL.createObjectURL(file);
+    img.onload = () => {
+      const scale = Math.min(1, 1280 / Math.max(img.width, img.height));
+      const c = document.createElement("canvas"); c.width = Math.round(img.width * scale); c.height = Math.round(img.height * scale);
+      c.getContext("2d").drawImage(img, 0, 0, c.width, c.height); URL.revokeObjectURL(url);
+      resolve(c.toDataURL("image/jpeg", 0.82));
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error("bad_image")); };
+    img.src = url;
+  });
+}
+function snapView(target){
+  const t = SNAP[target] ? target : "other";
+  let photo = null;
+  app.innerHTML = `<a class="back" href="${t === "other" ? "#ask" : `#g-${t === "breaker" ? "breaker" : t}`}">${ico("back", 18)} ${t === "other" ? "Ask" : "Back to the guide"}</a>
+  <section class="hello"><h1>Snap and Solve</h1><p class="muted">Take a clear photo of your ${esc(SNAP[t][0])}${t === "other" ? "" : "'s controls or label"}, close enough to read the words. You get steps for your exact one, marked right on your photo.</p></section>
+  <section class="sec">
+    <label class="f" for="snapWhat">What is it?<select id="snapWhat">${Object.keys(SNAP).map((k) => `<option value="${k}"${k === t ? " selected" : ""}>${esc(k === "other" ? "Something else" : SNAP[k][0][0].toUpperCase() + SNAP[k][0].slice(1))}</option>`).join("")}</select></label>
+    <label class="f" for="snapGoal">What do you want to do?<input type="text" id="snapGoal" maxlength="300" value="${esc(SNAP[t][1])}" placeholder="Example: how do I start a quick wash?"></label>
+    <div class="snap-pick"><label class="btn blue" for="snapCam">${ico("camera")} Take a photo</label><label class="btn ghost" for="snapLib">Choose a photo</label></div>
+    <input type="file" id="snapCam" accept="image/*" capture="environment" hidden><input type="file" id="snapLib" accept="image/*" hidden>
+    <div id="snapPrev" hidden></div>
+    <button class="btn full" id="snapGo" disabled>Get my steps</button>
+    <p class="meter" id="snapMeter"></p>
+    <p class="muted small">Your photo goes to our server and Anthropic to read it. It isn't saved. Leave people and personal papers out of the shot.</p>
+  </section>
+  <section class="sec" id="snapOut" aria-live="polite"></section>`;
+  const meter = () => { $("#snapMeter").innerHTML = `${snapsLeft()} of ${CONFIG.snapPerDay[tier()]} photos left today on ${tierName()}. <a href="#plans">Get more</a>`; };
+  meter();
+  $("#snapWhat").onchange = (e) => { const k = e.target.value; if (SNAP[k][1]) $("#snapGoal").value = SNAP[k][1]; };
+  const pick = async (e) => {
+    const f = e.target.files && e.target.files[0]; if (!f) return;
+    try { photo = await shrinkPhoto(f); } catch (err) { $("#snapOut").innerHTML = `<p class="err">That file isn't a photo we can open. Try another one.</p>`; return; }
+    $("#snapPrev").hidden = false; $("#snapPrev").innerHTML = `<img class="snap-img" src="${photo}" alt="Your photo">`; $("#snapGo").disabled = false;
+  };
+  $("#snapCam").onchange = pick; $("#snapLib").onchange = pick;
+  $("#snapGo").onclick = async () => {
+    if (!photo) return;
+    const out = $("#snapOut"), go = $("#snapGo");
+    if (!snapsLeft()) { out.innerHTML = `<div class="card stack"><h3>You've used today's photos</h3><p class="muted">They reset tomorrow. Silver gives you ${CONFIG.snapPerDay.silver} a day, or get a 5-photo pack for $1.99.</p><a class="btn blue full" href="#plans">See plans</a></div>`; return; }
+    go.disabled = true;
+    out.innerHTML = `<div class="card" style="display:flex;gap:12px;align-items:center"><span class="spin"></span><span>Reading your photo…</span></div>`;
+    try {
+      const r = await aiCall("snap", { image: photo, target: $("#snapWhat").value, goal: $("#snapGoal").value });
+      useSnap(); meter();
+      out.innerHTML = snapResult(r, photo);
+      wireReport({ title: r.what || "Snap and Solve", summary: r.summary, steps: r.steps, safety: r.safety, pro: "" }, "snap");
+    } catch (e) {
+      out.innerHTML = `<p class="err">${esc(ERRS[e && e.code] || ERRS.upstream)}</p>`;
+    } finally { go.disabled = false; }
+  };
+}
+function snapResult(r, photo){
+  if (!r.what && !r.steps.length) return `<div class="warn">${ico("camera", 20)}<span>${esc(r.retake || "We couldn't tell what's in that photo. Try again closer, with good light, so the labels are readable.")}</span></div>`;
+  const marks = r.steps.map((s, i) => (s.x === null ? "" : `<span class="mark" style="left:${s.x}%;top:${s.y}%">${i + 1}</span>`)).join("");
+  return `<article class="answer">
+    <div class="chips">${r.what ? `<span class="chip">${esc(r.what)}</span>` : ""}${r.brand ? `<span class="chip">${esc(r.brand)}${r.model ? " " + esc(r.model) : ""}</span>` : ""}${r.sure ? "" : `<span class="chip l2">Best guess</span>`}</div>
+    ${r.retake ? `<div class="warn">${ico("camera", 20)}<span>${esc(r.retake)}</span></div>` : ""}
+    <div class="snap-marked"><img src="${photo}" alt="Your photo with numbered markers">${marks}</div>
+    ${marks ? `<p class="muted small">Numbers on your photo match the steps. Markers are approximate, so check the labels.</p>` : ""}
+    ${r.summary ? `<p style="font-size:18px">${esc(r.summary)}</p>` : ""}
+    ${r.steps.length ? `<ol>${r.steps.map((s) => `<li><span><b>${esc(s.t)}</b>${esc(s.d)}</span></li>`).join("")}</ol>` : ""}
+    ${r.safety ? `<div class="warn">${ico("sos", 20)}<span>${esc(r.safety)}</span></div>` : ""}
+    ${r.manual ? `<a class="btn ghost full" href="https://www.google.com/search?q=${encodeURIComponent(r.manual)}" target="_blank" rel="noopener">Find the manual for this one</a>` : ""}
+    <div class="foot"><span>AI answer from your photo. Check the labels on your machine.</span><button class="linkbtn" id="rep">Report this answer</button></div>
+    <div id="repForm" hidden></div>
+  </article>`;
+}
+
 /* ---------- Ask Anything ---------- */
 const API = typeof window.ADULTED_API === "string" ? window.ADULTED_API.replace(/\/$/, "") : null;
 async function aiCall(kind, payload){
   if (API === null) throw { code: "no_api" };
-  const T = TASKS[kind], p = T.input(payload);
+  TASKS[kind].input(payload); // check it here first; the server checks it again
   let res, body = {};
-  try { res = await fetch(`${API}/ai/${kind}`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(p) }); }
+  try { res = await fetch(`${API}/ai/${kind}`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(payload) }); }
   catch (e) { throw { code: "offline" }; }
   try { body = await res.json(); } catch (e) {}
   if (!res.ok) throw { code: body.error === "daily_limit" ? "busy" : res.status === 429 ? "rate_limited" : "upstream" };
@@ -458,6 +551,7 @@ function askView(){
   const draft = store.get("draft", ""); if (draft) store.set("draft", "");
   const examples = ["My landlord won't fix the heat. What can I do?", "How much should I spend on rent?", "What do I need to bring to get a state ID?", "How do I get a stain out of my shirt?"];
   app.innerHTML = `<section class="hello"><h1>Ask Anything</h1><p class="muted">Ask the way you'd ask a friend who has it figured out. You get clear steps back.</p></section>
+  <section class="sec">${snapPromo("other").replace("Every thing is different", "Easier to show than tell?").replace("Snap a photo of yours and get steps for your exact one.", "Snap and Solve: take a photo of a machine, label, or problem and get steps marked on your photo.")}</section>
   <section class="sec">
     <label class="f" for="aq">Your question</label>
     <textarea id="aq" maxlength="600" placeholder="Example: my apartment has mold in the bathroom">${esc(draft)}</textarea>
@@ -500,7 +594,7 @@ function answerCard(r){
     <div id="repForm" hidden></div>
   </article>`;
 }
-function wireReport(r){
+function wireReport(r, feature = "ask"){
   const btn = $("#rep"), box = $("#repForm");
   btn.onclick = () => {
     box.hidden = false;
@@ -510,7 +604,7 @@ function wireReport(r){
       const content = [r.title, r.summary, ...r.steps.map((s) => `${s.t}: ${s.d}`), r.safety, r.pro].filter(Boolean).join("\n");
       try {
         if (API === null) throw 0;
-        const res = await fetch(`${API}/report`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ feature: "ask", reason: $("#rr").value, note: $("#rn").value, content }) });
+        const res = await fetch(`${API}/report`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ feature, reason: $("#rr").value, note: $("#rn").value, content }) });
         if (!res.ok) throw 0;
         box.innerHTML = `<p class="muted">Thanks. We'll look at it.</p>`; btn.hidden = true;
       } catch (e) { box.insertAdjacentHTML("beforeend", `<p class="err">Couldn't send that. Try again later.</p>`); }
@@ -686,7 +780,7 @@ const TABS = [["", "home", "Home"], ["learn", "book", "Learn"], ["ask", "chat", 
 function drawTabs(h){
   const g = h.startsWith("g-") ? GUIDES[h.slice(2)] : null;
   const kit = h.startsWith("list-") && CHECKLISTS[h.slice(5)] && CHECKLISTS[h.slice(5)].kit;
-  const active = kit ? "help" : h === "learn" || h.startsWith("m-") || h.startsWith("list-") ? "learn" : h === "ask" ? "ask" : h === "help" || (g && g.urgent) ? "help" : h === "me" || h === "plans" ? "me" : g ? "learn" : "";
+  const active = h.startsWith("snap-") ? "ask" : kit ? "help" : h === "learn" || h.startsWith("m-") || h.startsWith("list-") ? "learn" : h === "ask" ? "ask" : h === "help" || (g && g.urgent) ? "help" : h === "me" || h === "plans" ? "me" : g ? "learn" : "";
   $("#tabs").innerHTML = TABS.map(([k, ic, l]) => `<a href="#${k}"${k === "help" ? ' class="sos"' : ""}${k === active ? ' aria-current="page"' : ""}>${ico(ic, 24)}<span>${l}</span></a>`).join("");
   $("#planChip").textContent = tierName();
 }
@@ -696,6 +790,7 @@ function route(){
   if (h.startsWith("g-")) guideView(h.slice(2));
   else if (h.startsWith("m-")) moduleView(h.slice(2));
   else if (h.startsWith("list-")) checklistView(h.slice(5));
+  else if (h.startsWith("snap-")) snapView(h.slice(5));
   else if (h === "learn") learnView();
   else if (h === "ask") askView();
   else if (h === "help") helpView();

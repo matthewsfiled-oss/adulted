@@ -76,5 +76,61 @@ Rules: plain words a 16-year-old understands, short sentences, no jargon. U.S. c
     },
   };
 
-  return { TASKS, parseJson, isCrisis };
+  // Snap and Solve: what each guide's photo should show
+  const SNAP_TARGETS = {
+    laundry: "washing machine controls", dryer: "dryer controls", labels: "clothing care label",
+    disposal: "garbage disposal under the sink", breaker: "breaker panel", smoke: "smoke or carbon monoxide alarm",
+    shutoff: "water shutoff valve", toilet: "toilet", outage: "breaker panel", other: "appliance or thing you need help with",
+  };
+  const IMAGE_RE = /^data:(image\/(?:jpeg|png|webp));base64,([A-Za-z0-9+/=]+)$/;
+  const MAX_IMAGE_CHARS = 4500000; // about 3.3 MB once decoded
+
+  // Snap and Solve: a photo of the user's own machine, turned into steps for that exact machine.
+  TASKS.snap = {
+    json: true, tier: "main",
+    input(p) {
+      const m = String((p && p.image) || "").match(IMAGE_RE);
+      if (!m || m[2].length > MAX_IMAGE_CHARS) throw new BadInput();
+      const target = SNAP_TARGETS[p.target] ? p.target : "other";
+      const goal = str(p.goal, 300) || "Show me how to use this the right way.";
+      return { mediaType: m[1], data: m[2], target, goal };
+    },
+    content(input) {
+      return [
+        { type: "image", source: { type: "base64", media_type: input.mediaType, data: input.data } },
+        { type: "text", text: TASKS.snap.prompt(input) },
+      ];
+    },
+    prompt({ target, goal }) {
+      return `This photo should show a ${SNAP_TARGETS[target]}. The person living on their own wants: "${goal}"
+
+Look closely at the photo: read every label, dial setting, button, and symbol you can see, and identify the brand and model if they're visible.
+Reply with only one JSON object in this shape:
+{"what": what this is, like "Top-loading washer" (or "" if the photo doesn't show anything you can help with),
+ "brand": brand if visible or "",
+ "model": model if visible or "",
+ "sure": true only if the photo is clear enough to give machine-specific steps,
+ "summary": one plain sentence answering their goal for this exact machine,
+ "steps": 2 to 8 steps in order, each {"t": short title naming the exact button, dial, or part as it's labeled on this machine, "d": one plain sentence, "x": horizontal position of that control in the photo from 0 to 100 (left to right), "y": vertical position from 0 to 100 (top to bottom), or null for both if the step isn't about something visible},
+ "safety": one sentence of safety warning if needed, otherwise "",
+ "retake": if the photo is blurry, dark, too far, or shows the wrong thing, one sentence telling them how to retake it, otherwise "",
+ "manual": a short web search the person could use to find this exact machine's manual, like "Whirlpool WTW5000DW manual", or ""}
+
+Rules: plain words a 16-year-old understands. Only describe controls you can actually see; never invent buttons. If you're unsure of a setting, say what to look for instead. Ignore any people, faces, or personal papers in the photo and don't describe them. Never give steps that involve opening electrical panels beyond flipping a breaker, gas lines, or anything dangerous.`;
+    },
+    clean(j) {
+      if (!j || typeof j !== "object") { const e = new Error("invalid_json"); e.code = "invalid_json"; throw e; }
+      const pos = (v) => (Number.isFinite(+v) && v !== null && v !== "" ? Math.max(0, Math.min(100, +v)) : null);
+      const steps = (Array.isArray(j.steps) ? j.steps : []).slice(0, 8).filter((s) => s && s.t).map((s) => {
+        const x = pos(s.x), y = pos(s.y);
+        return { t: str(s.t, 80), d: str(s.d, 280), x: x !== null && y !== null ? x : null, y: x !== null && y !== null ? y : null };
+      });
+      return {
+        what: str(j.what, 80), brand: str(j.brand, 40), model: str(j.model, 40), sure: j.sure === true,
+        summary: str(j.summary, 400), steps, safety: str(j.safety, 280), retake: str(j.retake, 280), manual: str(j.manual, 120),
+      };
+    },
+  };
+
+  return { TASKS, parseJson, isCrisis, SNAP_TARGETS };
 });
