@@ -1,6 +1,8 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const D = require('../data');
+const fs = require('fs');
+const path = require('path');
 const ART = require('../../web/illustrations').ADULTED_ART;
 
 test('every guide is complete and every step has a picture', () => {
@@ -54,4 +56,9 @@ test('age comparisons find the right group and stay in range', () => {
   assert.equal(D.benchmark('home', 17), null);
   assert.equal(D.benchmark('license', 18).pct, 60.4);
   for (const b of Object.values(D.BENCHMARKS)) for (const [lo, hi, pct] of b.byAge) assert.ok(lo <= hi && pct > 0 && pct < 100 && b.source);
+});
+
+test('every step photo or video is in web/media', () => {
+  for (const [id, g] of Object.entries(D.GUIDES)) for (const st of g.steps) for (const f of [st.img, st.video].filter(Boolean))
+    assert.ok(fs.existsSync(path.join(__dirname, '../../web/media', f)), `${id}: missing web/media/${f}`);
 });

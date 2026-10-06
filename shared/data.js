@@ -48,9 +48,9 @@
       steps: [
         { t: "Check the tags", d: "Look for anything that says hand wash or dry clean only, and set it aside.", more: "Not sure what the symbols mean? Open the care label guide from the end of this guide.", v: "label" },
         { t: "Sort into piles", d: "Darks, lights, and whites. Wash towels and jeans apart from thin shirts.", more: "New dark or red clothes can bleed color the first few washes, so keep them with darks.", v: "sort" },
-        { t: "Empty pockets", d: "Pull out tissues, pens, and cash. Zip zippers and close hooks.", more: "One forgotten tissue leaves lint on the whole load. A pen can ruin it.", v: "pockets" },
-        { t: "Load it loosely", d: "Fill the drum about three-quarters full. Clothes need room to move.", more: "An overstuffed washer doesn't get clothes clean and can damage the machine.", v: "load" },
-        { t: "Add detergent", d: "Pods go in the drum before the clothes. Liquid goes in the dispenser, filled to the line on the cap.", more: "If your washer has the HE symbol, use detergent that also says HE. More detergent doesn't mean cleaner clothes, it leaves residue.", v: "detergent" },
+        { t: "Empty pockets", d: "Pull out tissues, pens, and cash. Zip zippers and close hooks.", more: "One forgotten tissue leaves lint on the whole load. A pen can ruin it.", v: "pockets", img: "laundry-3.jpg", alt: "A hand reaching into a jeans pocket" },
+        { t: "Load it loosely", d: "Fill the drum about three-quarters full. Clothes need room to move.", more: "An overstuffed washer doesn't get clothes clean and can damage the machine.", v: "load", img: "laundry-4.jpg", alt: "Loading clothes into a front-loading washer" },
+        { t: "Add detergent", d: "Pods go in the drum before the clothes. Liquid goes in the dispenser, filled to the line on the cap.", more: "If your washer has the HE symbol, use detergent that also says HE. More detergent doesn't mean cleaner clothes, it leaves residue.", v: "detergent", img: "laundry-5.jpg", alt: "Pouring a capful of detergent into the washer's dispenser drawer" },
         { t: "Pick a setting", d: "Normal and cold works for most clothes. Use hot for towels and sheets if the tag allows.", more: "Cold saves money and keeps colors from fading. Use the delicate setting for thin or stretchy clothes.", v: "dial" },
         { t: "Start it and set a timer", d: "Press start. Move clothes to the dryer soon after it finishes.", more: "Wet clothes left sitting for hours start to smell like mildew. If that happens, wash them again.", v: "timer" },
       ],
@@ -61,7 +61,7 @@
       n: "Read a clothing care label", mod: "home", cat: "Laundry", time: "1 minute", level: 1,
       tools: [],
       steps: [
-        { t: "Find the tag", d: "It's usually inside the back collar or along the side seam.", v: "label" },
+        { t: "Find the tag", d: "It's usually inside the back collar or along the side seam.", v: "label", img: "labels-1.jpg", alt: "Tags sewn inside the back collar of a striped shirt" },
         { t: "The tub means washing", d: "Dots inside show the temperature: one dot cold, two warm, three hot. A hand means hand wash.", more: "An X through any symbol means don't do it.", v: "symWash" },
         { t: "The triangle means bleach", d: "An empty triangle means any bleach is fine. Lines inside mean only non-chlorine bleach.", v: "symBleach" },
         { t: "The square means drying", d: "A circle inside means the dryer is fine. Dots show the heat level.", more: "A square with a line inside means hang it or lay it flat to dry instead.", v: "symDry" },

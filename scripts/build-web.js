@@ -27,6 +27,9 @@ if (process.argv.includes("--check")) {
   console.log("Phone app screens are up to date.");
   process.exit(0);
 }
+// Step photos and videos: served by the website at /app/media, and loaded by the phone app from there too.
+const mediaSrc = path.join(root, "web/media"), mediaOut = path.join(root, "server/web/media");
+if (fs.existsSync(mediaSrc)) { fs.mkdirSync(mediaOut, { recursive: true }); for (const f of fs.readdirSync(mediaSrc)) fs.copyFileSync(path.join(mediaSrc, f), path.join(mediaOut, f)); }
 write("server/web/index.html", head('<link rel="icon" href="/favicon.png"><script>window.ADULTED_API="/api";</script>') + fragment + tail);
 write("app/src/page.generated.js", phone);
 write("dist/adulted.html", fragment);

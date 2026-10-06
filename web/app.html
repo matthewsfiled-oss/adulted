@@ -137,6 +137,7 @@ p{margin:0}
 .step{flex:0 0 100%;scroll-snap-align:center;background:var(--card);border:2.5px solid var(--ink);border-radius:18px;overflow:hidden;display:flex;flex-direction:column}
 .step .pic{background:var(--paper);border-bottom:2.5px solid var(--ink);position:relative;aspect-ratio:16/9}
 .step .pic svg,.step .pic img,.step .pic video{display:block;width:100%;height:100%;object-fit:cover}
+.step .pic .fallback{display:block;width:100%;height:100%}
 .step .tag{position:absolute;right:10px;bottom:8px;font-size:12px;color:var(--muted);background:rgba(255,255,255,.85);padding:1px 8px;border-radius:999px}
 .step .body{padding:14px 16px 16px;display:flex;flex-direction:column;gap:6px}
 .step .n{font-size:14px;font-weight:700;color:var(--muted)}
@@ -414,10 +415,15 @@ function moduleView(id){
 }
 
 /* ---------- One guide: a deck of picture cards, one step each ---------- */
+/* Real photos and videos live in web/media. The website serves them at /app/media; the phone app loads them
+   from the live site. If one can't load (offline, or a preview), the step's drawing shows instead. */
+const mediaBase = () => (typeof window.ADULTED_MEDIA === "string" ? window.ADULTED_MEDIA : window.ADULTED_API === "/api" ? "/app/media/" : (CONFIG.siteUrl ? CONFIG.siteUrl + "/app/media/" : "media/"));
 function stepMedia(st){
-  if (st.video) return `<video src="${esc(st.video)}" muted loop playsinline autoplay aria-label="${esc(st.t)}"></video>`;
-  if (st.img) return `<img src="${esc(st.img)}" alt="${esc(st.alt || st.t)}">`;
-  return `${art(st.v)}<span class="tag">Illustration</span>`;
+  const fallback = `<span class="fallback"${st.img || st.video ? " hidden" : ""}>${art(st.v)}<span class="tag">Illustration</span></span>`;
+  const swap = `onerror="this.hidden=true;this.nextElementSibling.hidden=false"`;
+  if (st.video) return `<video src="${esc(mediaBase() + st.video)}" muted loop playsinline autoplay aria-label="${esc(st.t)}" ${swap}></video>${fallback}`;
+  if (st.img) return `<img src="${esc(mediaBase() + st.img)}" alt="${esc(st.alt || st.t)}" loading="lazy" ${swap}>${fallback}`;
+  return fallback;
 }
 function guideView(id){
   const g = GUIDES[id];

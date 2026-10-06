@@ -33,6 +33,7 @@ export default function App() {
   const injected = useMemo(() => {
     if (!state) return '';
     return `window.ADULTED_API=${JSON.stringify(API_URL ? `${API_URL}/api` : null)};
+window.ADULTED_MEDIA=${JSON.stringify(API_URL ? `${API_URL}/app/media/` : 'media/')};
 window.__AD_STATE=${JSON.stringify(state)};
 true;`;
   }, [state]);
