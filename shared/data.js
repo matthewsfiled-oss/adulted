@@ -76,7 +76,7 @@
       steps: [
         { t: "Clean the lint screen", d: "Pull it out, wipe the lint off with your fingers, and slide it back in. Every load.", more: "Built-up lint is a leading cause of dryer fires, and it makes clothes take longer to dry.", v: "lint" },
         { t: "Check for no-dryer items", d: "Leave out anything with a line-dry tag, rubber-backed rugs, and clothes with oil or gas stains.", v: "label" },
-        { t: "Don't overfill", d: "Fill it about halfway. Clothes need room to tumble.", v: "load" },
+        { t: "Don't overfill", d: "Fill it about halfway. Clothes need room to tumble.", v: "load", img: "dryer-3.jpg", alt: "Clothes tumbling inside a dryer" },
         { t: "Pick the heat", d: "Low heat for workout clothes and anything stretchy. Normal or high for towels and jeans.", v: "dial" },
         { t: "Take clothes out right away", d: "Fold or hang them while they're warm to cut down on wrinkles.", v: "timer", img: "dryer-5.jpg", alt: "A hand pulling clean clothes out of the drum" },
       ],
