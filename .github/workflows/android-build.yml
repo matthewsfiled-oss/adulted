@@ -1,0 +1,86 @@
+# Builds the Android app on Expo's servers. No computer needed.
+# Run it from GitHub: Actions tab > "Build Android app" > Run workflow.
+#
+# Needs one repository secret (Settings > Secrets and variables > Actions):
+#   EXPO_TOKEN   access token from expo.dev (Account settings > Access tokens)
+# Expo creates and keeps the app's signing key the first time it builds.
+
+name: Build Android app
+
+on:
+  workflow_dispatch:
+    inputs:
+      profile:
+        description: "preview = install link for testers (APK). production = file for the Play Store (AAB)."
+        type: choice
+        options: [preview, production]
+        default: preview
+
+permissions:
+  contents: write # lets the first run save the Expo project link into app/app.json
+
+concurrency:
+  group: android-build
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+      EXPO_NO_TELEMETRY: "1"
+    steps:
+      - name: Check secrets
+        run: |
+          if [ -z "$EXPO_TOKEN" ]; then
+            echo "::error::Missing secret EXPO_TOKEN. Create an access token at expo.dev (Account settings > Access tokens), then add it in GitHub under Settings > Secrets and variables > Actions."
+            exit 1
+          fi
+
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: app/package-lock.json
+
+      - name: Build the app screens
+        run: node scripts/build-web.js
+
+      - name: Install app packages
+        working-directory: app
+        run: npm ci
+
+      - name: Link the Expo project
+        working-directory: app
+        run: npx --yes eas-cli@24 init --non-interactive --force
+
+      - name: Save the project link
+        run: |
+          if ! git diff --quiet -- app/app.json; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add app/app.json
+            git commit -m "Link Expo project"
+            git push || echo "::warning::Couldn't save the project link. The build still runs."
+          fi
+
+      - name: Start the build
+        working-directory: app
+        run: |
+          set -o pipefail
+          npx --yes eas-cli@24 build --platform android --profile "${{ inputs.profile }}" --non-interactive --no-wait 2>&1 | tee build.log
+          URL=$(grep -oE 'https://expo\.dev/accounts/[^ )"]+/builds/[A-Za-z0-9-]+' build.log | head -1 || true)
+          {
+            echo "## Android build started (${{ inputs.profile }})"
+            echo ""
+            if [ -n "$URL" ]; then
+              echo "Open this on your Android phone: $URL"
+            else
+              echo "Open expo.dev, go to your **adulted** project, then **Builds**."
+            fi
+            echo ""
+            echo "It takes about 10 to 20 minutes (longer if Expo's free queue is busy). When it says **Finished**, tap **Install**."
+          } >> "$GITHUB_STEP_SUMMARY"

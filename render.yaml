@@ -1,0 +1,21 @@
+# One-click deploy on Render: Dashboard > New > Blueprint > pick this repository.
+# It builds the web app and runs the server, which serves the website (/), the web app (/app) and the API (/api).
+services:
+  - type: web
+    name: adulted
+    runtime: node
+    plan: free
+    buildCommand: npm run build
+    startCommand: npm start
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: DATABASE_URL
+        sync: false
+      - key: ADMIN_KEY
+        generateValue: true
+      - key: DAILY_AI_LIMIT
+        value: "1000"

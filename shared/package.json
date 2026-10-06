@@ -1,0 +1,8 @@
+{
+  "name": "adulted-shared",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Guides, prices, and AI prompts shared by the Adulted app and server",
+  "main": "data.js",
+  "scripts": { "test": "node --test test/*.test.js" }
+}

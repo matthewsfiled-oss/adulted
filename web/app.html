@@ -1,0 +1,606 @@
+<title>Adulted</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@112,700;112,800;112,900&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+/* Adulted: an appliance manual you actually want to read. Cool paper, ink line drawings,
+   one amber highlight that always means "look here". Green, amber and red only ever mean status. */
+:root{
+  --paper:#F1F4F7; --card:#FFFFFF; --ink:#16212E; --muted:#56657A; --line:#CBD5E0; --line2:#AEBBCA;
+  --blue:#1F4FD8; --blue-ink:#FFFFFF; --blue-soft:#E3EAFB;
+  --amber:#FFB81C; --amber-soft:#FFF3D1; --amber-ink:#5C3D00;
+  --green:#18864B; --green-soft:#E1F3E8; --red:#C8102E; --red-soft:#FDE8EB;
+  --display:"Archivo","Arial Narrow",system-ui,sans-serif; --body:"Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",sans-serif;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{background:var(--paper);-webkit-text-size-adjust:100%}
+body{background:var(--paper);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.5;margin:0}
+a{color:var(--blue)}
+button{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--blue);outline-offset:2px;border-radius:6px}
+.wrap{max-width:640px;margin:0 auto;padding:6px 16px 112px}
+h1,h2,h3{font-family:var(--display);font-stretch:112%;margin:0;line-height:1.08;text-wrap:balance}
+h1{font-weight:900;font-size:clamp(32px,8.4vw,44px);letter-spacing:-.01em}
+h2{font-weight:800;font-size:22px}
+h3{font-weight:800;font-size:18px;line-height:1.2}
+p{margin:0}
+.muted{color:var(--muted)}
+.small{font-size:15px}
+.stack{display:flex;flex-direction:column;gap:10px}
+.sec{margin-top:28px;display:flex;flex-direction:column;gap:12px}
+.sec-head{display:flex;justify-content:space-between;align-items:baseline;gap:12px}
+.sec-head a{font-size:15px;font-weight:700;text-decoration:none}
+
+/* top bar and tabs */
+.top{display:flex;align-items:center;justify-content:space-between;padding:10px 0 4px}
+.mark{font-family:var(--display);font-stretch:125%;font-weight:900;font-size:22px;color:var(--ink);text-decoration:none;display:flex;align-items:center;gap:8px;letter-spacing:-.01em}
+.mark i{display:inline-block;width:14px;height:14px;background:var(--amber);border:2.5px solid var(--ink);border-radius:3px;transform:rotate(45deg)}
+.plan-chip{font-size:14px;font-weight:700;text-decoration:none;color:var(--ink);border:2px solid var(--ink);border-radius:999px;padding:3px 12px}
+.tabs{position:fixed;left:0;right:0;bottom:0;z-index:20;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));background:var(--card);border-top:1.5px solid var(--line);padding:6px 4px calc(6px + env(safe-area-inset-bottom,0px))}
+.tabs a{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:12.5px;font-weight:700;color:var(--muted);text-decoration:none;padding:5px 0;border-radius:10px}
+.tabs a[aria-current="page"]{color:var(--ink);background:var(--amber-soft)}
+.tabs a.sos{color:var(--red)}
+.tabs a.sos[aria-current="page"]{background:var(--red-soft)}
+
+/* buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:48px;padding:10px 18px;border-radius:10px;border:2px solid var(--ink);background:var(--ink);color:#fff;font-weight:700;font-size:17px;text-decoration:none;cursor:pointer}
+.btn.blue{background:var(--blue);border-color:var(--blue)}
+.btn.ghost{background:transparent;color:var(--ink)}
+.btn.full{width:100%}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.linkbtn{background:none;border:0;padding:0;color:var(--blue);font-weight:700;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+
+/* home */
+.hello{margin-top:14px;display:flex;flex-direction:column;gap:14px}
+.search{display:flex;align-items:center;gap:10px;background:var(--card);border:2.5px solid var(--ink);border-radius:14px;padding:0 14px;min-height:58px}
+.search input{flex:1;min-width:0;border:0;background:transparent;font:inherit;font-size:18px;color:var(--ink);padding:14px 0}
+.search input:focus{outline:none}
+.search:focus-within{box-shadow:0 0 0 4px var(--amber)}
+.quick{display:flex;gap:8px;flex-wrap:wrap}
+.quick a{font-size:15px;font-weight:700;color:var(--ink);text-decoration:none;background:var(--card);border:1.5px solid var(--line2);border-radius:999px;padding:6px 13px}
+.sos-band{background:var(--red);color:#fff;border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:12px}
+.sos-band h2{color:#fff;font-size:20px}
+.sos-band .row3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.sos-band .row3 a{background:#fff;color:var(--ink);text-decoration:none;font-weight:700;font-size:15px;border-radius:10px;padding:10px 6px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:4px;line-height:1.2}
+.sos-band .more{color:#fff;font-weight:700;font-size:15px}
+.tip{background:var(--amber-soft);border-left:6px solid var(--amber);border-radius:4px 12px 12px 4px;padding:14px 16px;display:flex;gap:12px;align-items:flex-start}
+.tip b{display:block;font-size:14px;color:var(--amber-ink)}
+
+/* rows: guides, modules */
+.list{background:var(--card);border:1.5px solid var(--line);border-radius:14px;overflow:hidden}
+.row{display:grid;grid-template-columns:52px minmax(0,1fr) auto;gap:12px;align-items:center;padding:12px 14px;text-decoration:none;color:inherit;border-top:1.5px solid var(--line)}
+.row:first-child{border-top:0}
+.row .thumb{width:52px;height:52px;border-radius:10px;background:var(--paper);border:1.5px solid var(--line);display:grid;place-items:center;overflow:hidden}
+.row .thumb svg{width:64px;height:40px}
+.row .nm{font-weight:700;line-height:1.25}
+.row .sub{font-size:14.5px;color:var(--muted)}
+.row .go{font-size:14px;font-weight:700;color:var(--blue);white-space:nowrap}
+.row.done .nm::after{content:"Done";margin-left:8px;font-size:12.5px;font-weight:700;color:var(--green);background:var(--green-soft);padding:2px 8px;border-radius:999px;vertical-align:2px}
+.mods{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.mod{background:var(--card);border:1.5px solid var(--line);border-radius:14px;padding:14px;text-decoration:none;color:inherit;display:flex;flex-direction:column;gap:6px;min-height:132px}
+.mod .ic{width:40px;height:40px;border-radius:10px;display:grid;place-items:center;background:var(--paper);border:1.5px solid var(--line)}
+.mod.live .ic{background:var(--amber);border-color:var(--ink)}
+.mod .st{font-size:13.5px;font-weight:700;color:var(--muted)}
+.mod.live .st{color:var(--green)}
+.progress{height:10px;background:var(--paper);border:1.5px solid var(--line);border-radius:999px;overflow:hidden}
+.progress span{display:block;height:100%;background:var(--green)}
+.card{background:var(--card);border:1.5px solid var(--line);border-radius:14px;padding:16px}
+
+/* status chips */
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{font-size:14px;font-weight:700;padding:4px 10px;border-radius:999px;background:var(--card);border:1.5px solid var(--line);display:inline-flex;align-items:center;gap:6px}
+.chip.l1{background:var(--green-soft);border-color:transparent;color:var(--green)}
+.chip.l2{background:var(--amber-soft);border-color:transparent;color:var(--amber-ink)}
+.chip.l3{background:var(--red-soft);border-color:transparent;color:var(--red)}
+.warn{display:flex;gap:10px;align-items:flex-start;border-radius:12px;padding:12px 14px;font-size:16px;background:var(--amber-soft);color:var(--amber-ink)}
+.warn.red{background:var(--red-soft);color:#7A0A1C}
+.warn svg{flex:none;margin-top:2px}
+
+/* guide: the step deck */
+.back{display:inline-flex;align-items:center;gap:4px;font-weight:700;text-decoration:none;font-size:15px;margin-top:8px}
+.ghead{margin-top:10px;display:flex;flex-direction:column;gap:10px}
+.tools{font-size:15.5px;color:var(--muted)}
+.deck{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:12px;margin:6px -16px 0;padding:4px 16px 8px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.deck::-webkit-scrollbar{display:none}
+.step{flex:0 0 100%;scroll-snap-align:center;background:var(--card);border:2.5px solid var(--ink);border-radius:18px;overflow:hidden;display:flex;flex-direction:column}
+.step .pic{background:var(--paper);border-bottom:2.5px solid var(--ink);position:relative;aspect-ratio:16/9}
+.step .pic svg,.step .pic img,.step .pic video{display:block;width:100%;height:100%;object-fit:cover}
+.step .tag{position:absolute;right:10px;bottom:8px;font-size:12px;color:var(--muted);background:rgba(255,255,255,.85);padding:1px 8px;border-radius:999px}
+.step .body{padding:14px 16px 16px;display:flex;flex-direction:column;gap:6px}
+.step .n{font-size:14px;font-weight:700;color:var(--muted)}
+.step h2{font-size:24px}
+.step .d{font-size:19px;line-height:1.4}
+.step details{margin-top:4px;font-size:16px;color:var(--muted)}
+.step summary{cursor:pointer;font-weight:700;color:var(--blue);list-style:none}
+.step summary::-webkit-details-marker{display:none}
+.step details p{margin-top:6px}
+.decknav{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:10px;align-items:center;margin-top:10px}
+.dots{display:flex;gap:6px;justify-content:center;flex-wrap:wrap}
+.dots i{width:9px;height:9px;border-radius:50%;background:var(--line2)}
+.dots i.on{background:var(--ink);width:22px;border-radius:999px}
+.navbtn{width:52px;height:52px;border-radius:50%;border:2.5px solid var(--ink);background:var(--card);display:grid;place-items:center;cursor:pointer}
+.navbtn.next{background:var(--amber)}
+.navbtn:disabled{opacity:.3;cursor:default}
+.finish{display:flex;flex-direction:column;gap:10px}
+.done-msg{background:var(--green-soft);color:var(--green);font-weight:700;border-radius:12px;padding:12px 14px;display:flex;gap:8px;align-items:center}
+
+/* ask */
+textarea,input[type=text],select{font:inherit;color:var(--ink);background:var(--card);border:2px solid var(--line2);border-radius:10px;padding:12px 14px;width:100%}
+textarea{min-height:110px;resize:vertical;font-size:18px}
+textarea:focus,input[type=text]:focus,select:focus{outline:none;border-color:var(--ink);box-shadow:0 0 0 3px var(--amber)}
+label.f{display:flex;flex-direction:column;gap:6px;font-weight:700;font-size:15.5px}
+.answer{background:var(--card);border:2.5px solid var(--ink);border-radius:18px;padding:18px;display:flex;flex-direction:column;gap:12px}
+.answer ol{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:10px;counter-reset:a}
+.answer li{display:grid;grid-template-columns:34px minmax(0,1fr);gap:10px;counter-increment:a}
+.answer li::before{content:counter(a);width:34px;height:34px;border-radius:50%;background:var(--amber);border:2px solid var(--ink);display:grid;place-items:center;font-weight:700;font-family:var(--display)}
+.answer li b{display:block}
+.answer .foot{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;font-size:14.5px;color:var(--muted);border-top:1.5px solid var(--line);padding-top:10px}
+.meter{font-size:15px;color:var(--muted)}
+.err{color:var(--red);font-weight:700}
+.spin{width:22px;height:22px;border-radius:50%;border:3px solid var(--line2);border-top-color:var(--ink);animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* help */
+.panic{display:flex;flex-direction:column;gap:8px}
+.panic a{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:12px;align-items:center;background:var(--card);border:2px solid var(--red);border-radius:14px;padding:14px;text-decoration:none;color:var(--ink);font-weight:700;font-size:18px}
+.panic a .ic{width:40px;height:40px;border-radius:50%;background:var(--red);color:#fff;display:grid;place-items:center}
+.call{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:center;padding:12px 14px;border-top:1.5px solid var(--line)}
+.call:first-child{border-top:0}
+.call a.num{background:var(--ink);color:#fff;text-decoration:none;font-weight:700;border-radius:10px;padding:10px 14px;white-space:nowrap;font-size:16px}
+
+/* checklist */
+.check{display:grid;grid-template-columns:30px minmax(0,1fr);gap:12px;align-items:start;padding:12px 14px;border-top:1.5px solid var(--line);cursor:pointer}
+.check:first-child{border-top:0}
+.check input{appearance:none;-webkit-appearance:none;width:28px;height:28px;border:2.5px solid var(--ink);border-radius:8px;margin:0;background:var(--card);display:grid;place-items:center;cursor:pointer}
+.check input:checked{background:var(--green);border-color:var(--green)}
+.check input:checked::after{content:"";width:12px;height:7px;border:3px solid #fff;border-top:0;border-right:0;transform:rotate(-45deg) translate(1px,-2px)}
+.check input:checked + span{color:var(--muted);text-decoration:line-through}
+
+/* plans */
+.tiers{display:flex;flex-direction:column;gap:12px}
+.tier{background:var(--card);border:2px solid var(--line);border-radius:16px;padding:18px;display:flex;flex-direction:column;gap:10px}
+.tier.gold{border-color:var(--ink);box-shadow:6px 6px 0 var(--amber)}
+.tier .price{font-family:var(--display);font-stretch:112%;font-weight:900;font-size:30px}
+.tier ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.tier li{display:grid;grid-template-columns:22px minmax(0,1fr);gap:8px;font-size:16px}
+.tier li.soon{color:var(--muted)}
+.tier li.soon em{font-style:normal;font-size:13px;font-weight:700;background:var(--paper);border-radius:999px;padding:1px 7px;margin-left:4px}
+.pricelist{display:flex;flex-direction:column}
+.pricelist div{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-top:1.5px solid var(--line);font-size:16px}
+.pricelist div:first-child{border-top:0}
+.pricelist b{white-space:nowrap}
+
+.lvl{display:flex;gap:14px;align-items:center}
+.lvl .big{font-family:var(--display);font-stretch:125%;font-weight:900;font-size:44px;line-height:1;background:var(--amber);border:2.5px solid var(--ink);border-radius:14px;min-width:72px;height:72px;display:grid;place-items:center}
+.form{display:flex;flex-direction:column;gap:14px}
+.two{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.toast{position:fixed;left:50%;bottom:92px;transform:translateX(-50%);background:var(--ink);color:#fff;font-weight:700;border-radius:999px;padding:10px 18px;z-index:40;font-size:15px}
+@media (prefers-reduced-motion:reduce){.spin{animation:none}.deck{scroll-behavior:auto}}
+@media (min-width:700px){.step .d{font-size:20px}}
+</style>
+
+<div class="wrap">
+  <header class="top"><a class="mark" href="#"><i></i>Adulted</a><a class="plan-chip" id="planChip" href="#plans">Free</a></header>
+  <main id="app"></main>
+</div>
+<nav class="tabs" id="tabs" aria-label="Main"></nav>
+<div class="toast" id="toast" role="status" hidden></div>
+
+<!--@SHARED-->
+<script>
+/* ---------- basics ---------- */
+const esc = (s) => String(s == null ? "" : s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const $ = (sel) => document.querySelector(sel);
+const app = document.getElementById("app");
+const pad = (n) => String(n).padStart(2, "0");
+const todayStr = () => { const d = new Date(); return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`; };
+const money = (n) => "$" + n.toFixed(2);
+const art = (k) => ADULTED_ART.illustration(k);
+function toast(msg){ const t = $("#toast"); t.textContent = msg; t.hidden = false; clearTimeout(toast.t); toast.t = setTimeout(() => { t.hidden = true; }, 2200); }
+
+const ICONS = {
+  home:'<path d="M3 11 12 4l9 7"/><path d="M5 10v10h14V10"/><path d="M10 20v-6h4v6"/>',
+  book:'<path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z"/><path d="M4 19V5"/><path d="M9 7h6"/>',
+  chat:'<path d="M4 5h16v11H9l-5 4z"/><path d="M8 9h8M8 12h5"/>',
+  sos:'<path d="M12 3 2 20h20z"/><path d="M12 10v4"/><circle cx="12" cy="17" r=".6" fill="currentColor"/>',
+  user:'<circle cx="12" cy="8" r="4"/><path d="M4 21c1-4 4-6 8-6s7 2 8 6"/>',
+  search:'<circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/>',
+  back:'<path d="M15 5l-7 7 7 7"/>', next:'<path d="M9 5l7 7-7 7"/>',
+  check:'<path d="M5 12l5 5 9-10"/>', x:'<path d="M6 6l12 12M18 6 6 18"/>',
+  phone:'<path d="M5 4h4l2 5-3 2a11 11 0 0 0 5 5l2-3 5 2v4a2 2 0 0 1-2 2A17 17 0 0 1 3 6a2 2 0 0 1 2-2"/>',
+  flame:'<path d="M12 3c1 4 6 6 6 11a6 6 0 0 1-12 0c0-3 2-4 2-7 2 1 3 2 4 4 0-3-1-5 0-8"/>',
+  drop:'<path d="M12 3s7 7 7 12a7 7 0 0 1-14 0c0-5 7-12 7-12"/>',
+  key:'<circle cx="8" cy="15" r="4"/><path d="m11 12 9-9M17 6l3 3"/>',
+  bolt:'<path d="M13 2 4 14h7l-1 8 9-12h-7z"/>', bell:'<path d="M6 16V11a6 6 0 0 1 12 0v5l2 2H4z"/><path d="M10 21h4"/>',
+  toilet:'<path d="M7 3h10v7H7z"/><path d="M4 11h16a8 8 0 0 1-8 7v3H9v-3"/>',
+  wallet:'<path d="M3 7h18v13H3z"/><path d="M3 7l12-4v4"/><circle cx="16" cy="13.5" r="1.2"/>',
+  door:'<path d="M5 21V3h11v18"/><path d="M3 21h18"/><circle cx="13" cy="12" r=".8" fill="currentColor"/>',
+  food:'<path d="M5 3v8a3 3 0 0 0 6 0V3M8 3v18"/><path d="M17 21V3c-2 1-3 4-3 8h3"/>',
+  heart:'<path d="M12 20s-8-5-8-11a4.5 4.5 0 0 1 8-2.5A4.5 4.5 0 0 1 20 9c0 6-8 11-8 11z"/>',
+  car:'<path d="M3 16v-4l2-5h14l2 5v4z"/><circle cx="7.5" cy="16.5" r="2"/><circle cx="16.5" cy="16.5" r="2"/>',
+  bulb:'<path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-4 10.5c1 1 1 2 1 2.5h6c0-.5 0-1.5 1-2.5A6 6 0 0 0 12 3"/>',
+  list:'<path d="M9 6h11M9 12h11M9 18h11"/><path d="m3 6 1.5 1.5L7 5M3 12l1.5 1.5L7 11M3 18l1.5 1.5L7 17"/>',
+  lock:'<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/>',
+};
+const ico = (n, s = 22, w = 2.2) => `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[n] || ""}</svg>`;
+const MOD_ICON = { home: "home", money: "wallet", living: "door", food: "food", health: "heart", car: "car" };
+const PANIC_ICON = { gas: "flame", shutoff: "drop", toilet: "toilet", outage: "bolt", lockout: "key", smoke: "bell" };
+const LEVEL = { 1: ["Easy", "l1"], 2: ["Take your time", "l2"], 3: ["Act fast", "l3"] };
+
+/* ---------- saved data: this device only (the phone app keeps it in its own storage) ---------- */
+const NATIVE_STATE = (window.__AD_STATE && typeof window.__AD_STATE === "object") ? window.__AD_STATE : null;
+const store = {
+  get(k, d){
+    if (NATIVE_STATE && k in NATIVE_STATE) return NATIVE_STATE[k];
+    try { const v = localStorage.getItem("adulted-" + k); return v ? JSON.parse(v) : d; } catch (e) { return d; }
+  },
+  set(k, v){
+    if (NATIVE_STATE) NATIVE_STATE[k] = v;
+    try { localStorage.setItem("adulted-" + k, JSON.stringify(v)); } catch (e) {}
+    try { if (window.ReactNativeWebView) window.ReactNativeWebView.postMessage(JSON.stringify({ type: "store", key: k, value: v })); } catch (e) {}
+  },
+};
+let PROFILE = store.get("profile", {});
+let DONE = store.get("done", []);
+let CHECKS = store.get("checks", {});
+const tier = () => { const t = store.get("tier", "free"); return CONFIG.askPerDay[t] ? t : "free"; };
+const tierName = () => TIERS.find((t) => t.id === tier()).n;
+function asksLeft(){
+  const u = store.get("asks", { day: "", n: 0 });
+  const used = u.day === todayStr() ? u.n : 0;
+  return Math.max(0, CONFIG.askPerDay[tier()] - used);
+}
+function useAsk(){ const t = todayStr(), u = store.get("asks", { day: t, n: 0 }); store.set("asks", { day: t, n: (u.day === t ? u.n : 0) + 1 }); }
+function markDone(id){ if (!DONE.includes(id)) { DONE = DONE.concat(id); store.set("done", DONE); } }
+const recent = () => store.get("recent", []).filter((id) => GUIDES[id]);
+function addRecent(id){ store.set("recent", [id].concat(recent().filter((x) => x !== id)).slice(0, 5)); }
+
+/* ---------- search: guide titles, steps, and everyday words people actually type ---------- */
+const WORDS = {
+  laundry: "washer washing machine wash clothes detergent pods load", labels: "tag symbols care label dry clean bleach iron",
+  dryer: "lint dry clothes damp", toilet: "clog clogged plunger overflow poop bathroom", breaker: "outlet no power room electricity tripped circuit",
+  smoke: "beeping chirp chirping alarm detector battery", disposal: "sink garbage jammed humming kitchen", shutoff: "leak leaking flood flooding pipe burst water everywhere",
+  cleaning: "clean chores mess dirty routine", outage: "blackout power out lights out storm", gas: "smell rotten eggs stove leak", lockout: "locked out keys lost key door",
+};
+function searchGuides(q){
+  const terms = q.toLowerCase().split(/\s+/).filter((t) => t.length > 1);
+  if (!terms.length) return [];
+  return Object.keys(GUIDES).map((id) => {
+    const g = GUIDES[id], hay = [g.n, g.cat, WORDS[id] || "", g.steps.map((s) => s.t).join(" ")].join(" ").toLowerCase();
+    const score = terms.reduce((n, t) => n + (hay.includes(t) ? (g.n.toLowerCase().includes(t) ? 3 : 1) : 0), 0);
+    return [id, score];
+  }).filter(([, s]) => s > 0).sort((a, b) => b[1] - a[1]).map(([id]) => id);
+}
+
+/* ---------- shared pieces ---------- */
+function guideRow(id){
+  const g = GUIDES[id];
+  return `<a class="row${DONE.includes(id) ? " done" : ""}" href="#g-${id}"><span class="thumb">${art(g.steps[0].v)}</span>
+    <span><span class="nm">${esc(g.n)}</span><br><span class="sub">${g.steps.length} steps, ${esc(g.time.toLowerCase())}</span></span>
+    <span class="go">Show me how</span></a>`;
+}
+const homeGuides = () => Object.keys(GUIDES).filter((id) => GUIDES[id].mod === "home" && !GUIDES[id].urgent);
+function checklistPct(id){ const all = CHECKLISTS[id].groups.flatMap(([, items]) => items); const c = CHECKS[id] || {}; return [all.filter((_, i) => c[i]).length, all.length]; }
+
+/* ---------- Home ---------- */
+function homeView(){
+  const name = (PROFILE.name || "").trim();
+  const tip = TIPS[dayIndex(todayStr(), TIPS.length)];
+  const [done, total] = checklistPct("apartment");
+  const rec = recent();
+  app.innerHTML = `
+  <section class="hello">
+    <h1>${name ? `Hey ${esc(name)}, what do you need help with?` : "What do you need help with?"}</h1>
+    <div class="search">${ico("search", 24)}<input id="q" type="search" autocomplete="off" enterkeyhint="search" placeholder="Try: clogged toilet, washer" aria-label="Search for help"></div>
+    <div class="quick" id="quick">${[["laundry", "Laundry"], ["toilet", "Clogged toilet"], ["breaker", "Power out in one room"], ["smoke", "Alarm beeping"]].map(([id, l]) => `<a href="#g-${id}">${l}</a>`).join("")}</div>
+  </section>
+  <section class="sec" id="res" hidden></section>
+  <div id="homeBody">
+    <section class="sec"><div class="sos-band">
+      <h2>Something wrong right now?</h2>
+      <div class="row3">${["gas", "shutoff", "lockout"].map((id) => `<a href="#g-${id}">${ico(PANIC_ICON[id], 24)}${esc({ gas: "I smell gas", shutoff: "Water leak", lockout: "Locked out" }[id])}</a>`).join("")}</div>
+      <a class="more" href="#help">More emergencies and numbers to call</a>
+    </div></section>
+    ${rec.length ? `<section class="sec"><div class="sec-head"><h2>Pick up where you left off</h2></div><div class="list">${rec.slice(0, 2).map(guideRow).join("")}</div></section>` : ""}
+    <section class="sec"><div class="tip">${ico("bulb", 24)}<p><b>Today's tip</b>${esc(tip)}</p></div></section>
+    <section class="sec"><div class="sec-head"><h2>Your first apartment</h2><a href="#list-apartment">Open checklist</a></div>
+      <a class="card stack" href="#list-apartment" style="text-decoration:none;color:inherit"><p>${done ? `${done} of ${total} done. Keep going.` : "Everything to do before you sign, on move-in day, and in your first month."}</p><div class="progress"><span style="width:${Math.round(done / total * 100)}%"></span></div></a>
+    </section>
+    <section class="sec"><div class="sec-head"><h2>Learn the basics</h2><a href="#learn">See all</a></div>${modsGrid()}</section>
+  </div>`;
+  const q = $("#q"), res = $("#res"), body = $("#homeBody");
+  q.addEventListener("input", () => {
+    const v = q.value.trim();
+    if (!v) { res.hidden = true; body.hidden = false; return; }
+    const hits = searchGuides(v);
+    body.hidden = true; res.hidden = false;
+    res.innerHTML = `${hits.length ? `<div class="list">${hits.slice(0, 6).map(guideRow).join("")}</div>` : `<p class="muted">No guide for that yet.</p>`}
+      <a class="btn blue full" href="#ask" id="askIt">${ico("chat")} Ask Anything about "${esc(v.slice(0, 40))}"</a>`;
+    $("#askIt").addEventListener("click", () => store.set("draft", v));
+  });
+}
+function modsGrid(){
+  return `<div class="mods">${MODULES.map((m) => `<a class="mod${m.live ? " live" : ""}" href="#m-${m.id}"><span class="ic">${ico(MOD_ICON[m.id])}</span><h3>${esc(m.n)}</h3><span class="st">${m.live ? `${homeGuides().length} guides` : "Coming soon"}</span></a>`).join("")}</div>`;
+}
+
+/* ---------- Learn and modules ---------- */
+function learnView(){
+  app.innerHTML = `<section class="hello"><h1>Learn the basics</h1><p class="muted">Short guides with a picture for every step. Start with what you need today.</p></section>
+  <section class="sec">${modsGrid()}</section>
+  <section class="sec"><div class="sec-head"><h2>Checklists</h2></div><div class="list">${Object.keys(CHECKLISTS).map((id) => { const [d, t] = checklistPct(id); return `<a class="row" href="#list-${id}"><span class="thumb">${ico("list", 26)}</span><span><span class="nm">${esc(CHECKLISTS[id].n)}</span><br><span class="sub">${d} of ${t} done</span></span><span class="go">Open</span></a>`; }).join("")}</div></section>`;
+}
+function moduleView(id){
+  const m = MODULES.find((x) => x.id === id);
+  if (!m) return learnView();
+  if (!m.live) {
+    app.innerHTML = `<a class="back" href="#learn">${ico("back", 18)} Learn</a>
+    <section class="hello"><h1>${esc(m.n)}</h1><p class="muted">${esc(m.blurb)}.</p></section>
+    <section class="sec"><div class="card stack"><h3>Coming soon</h3><p class="muted small">These guides are being made now:</p>
+      <ul style="margin:0;padding-left:20px">${m.soon.map((s) => `<li>${esc(s)}</li>`).join("")}</ul></div>
+      <a class="btn blue full" href="#ask">${ico("chat")} Ask Anything in the meantime</a></section>`;
+    return;
+  }
+  const ids = homeGuides(), cats = [...new Set(ids.map((x) => GUIDES[x].cat))];
+  app.innerHTML = `<a class="back" href="#learn">${ico("back", 18)} Learn</a>
+  <section class="hello"><h1>${esc(m.n)}</h1><p class="muted">${esc(m.blurb)}.</p></section>
+  ${cats.map((c) => `<section class="sec"><h2>${esc(c)}</h2><div class="list">${ids.filter((x) => GUIDES[x].cat === c).map(guideRow).join("")}</div></section>`).join("")}
+  <section class="sec"><h2>Emergencies</h2><div class="list">${PANIC.filter((x) => GUIDES[x].urgent).map(guideRow).join("")}</div></section>`;
+}
+
+/* ---------- One guide: a deck of picture cards, one step each ---------- */
+function stepMedia(st){
+  if (st.video) return `<video src="${esc(st.video)}" muted loop playsinline autoplay aria-label="${esc(st.t)}"></video>`;
+  if (st.img) return `<img src="${esc(st.img)}" alt="${esc(st.alt || st.t)}">`;
+  return `${art(st.v)}<span class="tag">Illustration</span>`;
+}
+function guideView(id){
+  const g = GUIDES[id];
+  if (!g) return homeView();
+  addRecent(id);
+  const [lvl, cls] = LEVEL[g.level] || LEVEL[1];
+  const n = g.steps.length;
+  const backTo = g.urgent ? ["#help", "Help"] : ["#m-" + g.mod, ((MODULES.find((m) => m.id === g.mod) || {}).n || "All") + " guides"];
+  app.innerHTML = `<a class="back" href="${backTo[0]}">${ico("back", 18)} ${esc(backTo[1])}</a>
+  <section class="ghead">
+    <h1 style="font-size:clamp(28px,7.4vw,38px)">${esc(g.n)}</h1>
+    <div class="chips"><span class="chip ${cls}">${esc(lvl)}</span><span class="chip">${esc(g.time)}</span><span class="chip">${n} steps</span></div>
+    ${g.tools.length ? `<p class="tools"><b style="color:var(--ink)">You'll need:</b> ${g.tools.map(esc).join(", ")}</p>` : ""}
+    ${g.safety ? `<div class="warn${g.level === 3 ? " red" : ""}">${ico("sos", 20)}<span>${esc(g.safety)}</span></div>` : ""}
+  </section>
+  <div class="deck" id="deck" tabindex="0" aria-label="Steps, swipe to go through them">${g.steps.map((st, i) => `
+    <article class="step" aria-label="Step ${i + 1} of ${n}">
+      <div class="pic">${stepMedia(st)}</div>
+      <div class="body"><span class="n">Step ${i + 1} of ${n}</span><h2>${esc(st.t)}</h2><p class="d">${esc(st.d)}</p>
+        ${st.more ? `<details><summary>More details</summary><p>${esc(st.more)}</p></details>` : ""}</div>
+    </article>`).join("")}</div>
+  <div class="decknav"><button class="navbtn" id="prev" aria-label="Previous step">${ico("back", 24, 2.6)}</button><div class="dots" id="dots">${g.steps.map((_, i) => `<i${i === 0 ? ' class="on"' : ""}></i>`).join("")}</div><button class="navbtn next" id="nextB" aria-label="Next step">${ico("next", 24, 2.6)}</button></div>
+  <section class="sec finish" id="finish">
+    ${DONE.includes(id) ? `<div class="done-msg">${ico("check")} You've done this one.</div>` : `<button class="btn full" id="didIt">${ico("check")} I did it</button>`}
+    ${g.pro ? `<div class="warn">${ico("phone", 20)}<span><b>When to call for help:</b> ${esc(g.pro)}</span></div>` : ""}
+    <a class="btn ghost full" href="#ask" id="askMore">${ico("chat")} Still stuck? Ask Anything</a>
+  </section>
+  ${g.related && g.related.length ? `<section class="sec"><h2>Related</h2><div class="list">${g.related.filter((x) => GUIDES[x]).map(guideRow).join("")}</div></section>` : ""}`;
+  const deck = $("#deck"), dots = [...document.querySelectorAll("#dots i")], prev = $("#prev"), next = $("#nextB");
+  let at = 0, busy = null;
+  const show = () => { dots.forEach((d, i) => d.classList.toggle("on", i === at)); prev.disabled = at === 0; next.disabled = at === n - 1; };
+  const go = (i) => { at = Math.max(0, Math.min(n - 1, i)); clearTimeout(busy); busy = setTimeout(() => { busy = null; }, 600); deck.scrollTo({ left: at * (deck.children[0].offsetWidth + 12), behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" }); show(); };
+  deck.addEventListener("scroll", () => { if (busy) return; const w = deck.children[0].offsetWidth + 12; const i = Math.round(deck.scrollLeft / w); if (i !== at) { at = i; show(); } }, { passive: true });
+  deck.addEventListener("keydown", (e) => { if (e.key === "ArrowRight") { e.preventDefault(); go(at + 1); } if (e.key === "ArrowLeft") { e.preventDefault(); go(at - 1); } });
+  prev.onclick = () => go(at - 1); next.onclick = () => go(at + 1);
+  show();
+  const did = $("#didIt");
+  if (did) did.onclick = () => { markDone(id); did.outerHTML = `<div class="done-msg">${ico("check")} Nice. That's ${DONE.length} skill${DONE.length === 1 ? "" : "s"} learned.</div>`; };
+  $("#askMore").addEventListener("click", () => store.set("draft", `${g.n}: `));
+}
+
+/* ---------- Ask Anything ---------- */
+const API = typeof window.ADULTED_API === "string" ? window.ADULTED_API.replace(/\/$/, "") : null;
+async function aiCall(kind, payload){
+  if (API === null) throw { code: "no_api" };
+  const T = TASKS[kind], p = T.input(payload);
+  let res, body = {};
+  try { res = await fetch(`${API}/ai/${kind}`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(p) }); }
+  catch (e) { throw { code: "offline" }; }
+  try { body = await res.json(); } catch (e) {}
+  if (!res.ok) throw { code: body.error === "daily_limit" ? "busy" : res.status === 429 ? "rate_limited" : "upstream" };
+  return body.result;
+}
+const ERRS = {
+  no_api: "Ask Anything isn't connected in this preview. It works in the app and on the website.",
+  offline: "You look offline. Check your connection and try again.",
+  rate_limited: "That's a lot of questions in a few minutes. Wait a bit and try again.",
+  busy: "Ask Anything is very busy today. Try again tomorrow, or use a guide.",
+  upstream: "Couldn't get an answer just now. Try again.",
+};
+const crisisCard = () => `<div class="warn red">${ico("heart", 20)}<span><b>You don't have to handle this alone.</b> Call or text <a href="tel:988">988</a> any time to reach the Suicide and Crisis Lifeline. If you're in danger right now, call <a href="tel:911">911</a>.</span></div>`;
+function profileForAi(){
+  const p = {};
+  if (PROFILE.state) p.state = PROFILE.state;
+  if (PROFILE.living) p.living = PROFILE.living;
+  if (PROFILE.stage) p.stage = PROFILE.stage;
+  const car = [PROFILE.carYear, PROFILE.carMake, PROFILE.carModel].filter(Boolean).join(" ");
+  if (car) p.car = car;
+  return p;
+}
+function askView(){
+  const draft = store.get("draft", ""); if (draft) store.set("draft", "");
+  const examples = ["My landlord won't fix the heat. What can I do?", "How much should I spend on rent?", "What do I need to bring to get a state ID?", "How do I get a stain out of my shirt?"];
+  app.innerHTML = `<section class="hello"><h1>Ask Anything</h1><p class="muted">Ask the way you'd ask a friend who has it figured out. You get clear steps back.</p></section>
+  <section class="sec">
+    <label class="f" for="aq">Your question</label>
+    <textarea id="aq" maxlength="600" placeholder="Example: my apartment has mold in the bathroom">${esc(draft)}</textarea>
+    <div class="quick">${examples.map((e) => `<a href="#ask" data-ex="${esc(e)}">${esc(e)}</a>`).join("")}</div>
+    <button class="btn blue full" id="askGo">${ico("chat")} Get the answer</button>
+    <p class="meter" id="meter"></p>
+  </section>
+  <section class="sec" id="out" aria-live="polite"></section>`;
+  const aq = $("#aq"), go = $("#askGo"), out = $("#out");
+  const meter = () => { const left = asksLeft(); $("#meter").innerHTML = tier() === "gold" ? "Unlimited questions on Gold." : `${left} of ${CONFIG.askPerDay[tier()]} questions left today on ${tierName()}. <a href="#plans">Get more</a>`; };
+  meter();
+  document.querySelectorAll("[data-ex]").forEach((a) => a.addEventListener("click", (e) => { e.preventDefault(); aq.value = a.dataset.ex; aq.focus(); }));
+  go.onclick = async () => {
+    const q = aq.value.trim();
+    if (q.length < 3) { out.innerHTML = `<p class="err">Type a question first.</p>`; return; }
+    const crisis = isCrisis(q);
+    if (!asksLeft()) { out.innerHTML = `${crisis ? crisisCard() : ""}${outOfAsks()}`; return; }
+    go.disabled = true;
+    out.innerHTML = `${crisis ? crisisCard() : ""}<div class="card" style="display:flex;gap:12px;align-items:center"><span class="spin"></span><span>Working on your answer…</span></div>`;
+    try {
+      const r = await aiCall("ask", { q, profile: profileForAi() });
+      useAsk(); meter();
+      out.innerHTML = `${crisis ? crisisCard() : ""}${answerCard(r)}`;
+      wireReport(r);
+    } catch (e) {
+      out.innerHTML = `${crisis ? crisisCard() : ""}<p class="err">${esc(ERRS[e && e.code] || ERRS.upstream)}</p>`;
+    } finally { go.disabled = false; }
+  };
+}
+function answerCard(r){
+  return `<article class="answer">
+    ${r.urgent ? `<div class="warn red">${ico("sos", 20)}<span>This could be an emergency. If anyone is in danger, call <a href="tel:911">911</a> now.</span></div>` : ""}
+    <h2>${esc(r.title)}</h2>
+    ${r.summary ? `<p style="font-size:18px">${esc(r.summary)}</p>` : ""}
+    ${r.steps.length ? `<ol>${r.steps.map((s) => `<li><span><b>${esc(s.t)}</b>${esc(s.d)}</span></li>`).join("")}</ol>` : ""}
+    ${r.safety ? `<div class="warn">${ico("sos", 20)}<span>${esc(r.safety)}</span></div>` : ""}
+    ${r.pro ? `<div class="warn">${ico("phone", 20)}<span><b>When to call for help:</b> ${esc(r.pro)}</span></div>` : ""}
+    ${r.guides.length ? `<div class="stack"><b>Picture guides for this</b><div class="list">${r.guides.map(guideRow).join("")}</div></div>` : ""}
+    <div class="foot"><span>AI answer. Check anything important with a professional.</span><button class="linkbtn" id="rep">Report this answer</button></div>
+    <div id="repForm" hidden></div>
+  </article>`;
+}
+function wireReport(r){
+  const btn = $("#rep"), box = $("#repForm");
+  btn.onclick = () => {
+    box.hidden = false;
+    box.innerHTML = `<div class="form"><label class="f">What's wrong with it?<select id="rr"><option value="wrong">It's wrong</option><option value="unsafe">It's unsafe</option><option value="kids">Not OK for young people</option><option value="other">Something else</option></select></label>
+      <label class="f">Anything to add? (optional)<input type="text" id="rn" maxlength="500"></label><button class="btn ghost" id="rs">Send report</button></div>`;
+    $("#rs").onclick = async () => {
+      const content = [r.title, r.summary, ...r.steps.map((s) => `${s.t}: ${s.d}`), r.safety, r.pro].filter(Boolean).join("\n");
+      try {
+        if (API === null) throw 0;
+        const res = await fetch(`${API}/report`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ feature: "ask", reason: $("#rr").value, note: $("#rn").value, content }) });
+        if (!res.ok) throw 0;
+        box.innerHTML = `<p class="muted">Thanks. We'll look at it.</p>`; btn.hidden = true;
+      } catch (e) { box.insertAdjacentHTML("beforeend", `<p class="err">Couldn't send that. Try again later.</p>`); }
+    };
+  };
+}
+function outOfAsks(){
+  return `<div class="card stack"><h3>You've used today's questions</h3>
+    <p class="muted">Free comes with ${CONFIG.askPerDay.free} a day, and they reset tomorrow. Silver gives you ${CONFIG.askPerDay.silver} a day for ${money(CONFIG.silverMonthly)} a month, or add 25 more for $1.99.</p>
+    <a class="btn blue full" href="#plans">See plans</a><a class="btn ghost full" href="#learn">Browse the picture guides</a></div>`;
+}
+
+/* ---------- Help: emergencies and numbers ---------- */
+function helpView(){
+  app.innerHTML = `<section class="hello"><h1>Something wrong right now?</h1><p class="muted">Pick what's happening. Each one starts with what to do first.</p></section>
+  <section class="sec panic">${PANIC.map((id) => `<a href="#g-${id}"><span class="ic">${ico(PANIC_ICON[id], 22)}</span><span>${esc(GUIDES[id].n)}</span>${ico("next", 20)}</a>`).join("")}</section>
+  <section class="sec"><h2>Numbers to call</h2><div class="list">${RESOURCES.map((r) => `<div class="call"><span><b>${esc(r.n)}</b><br><span class="small muted">${esc(r.note)}</span></span><a class="num" href="tel:${r.num.replace(/[^0-9]/g, "")}">${ico("phone", 16)} ${esc(r.num)}</a></div>`).join("")}</div></section>`;
+}
+
+/* ---------- Checklists ---------- */
+function checklistView(id){
+  const c = CHECKLISTS[id];
+  if (!c) return learnView();
+  const saved = CHECKS[id] || {};
+  let i = -1;
+  const [d, t] = checklistPct(id);
+  app.innerHTML = `<a class="back" href="#learn">${ico("back", 18)} Learn</a>
+  <section class="hello"><h1>${esc(c.n)} checklist</h1><p class="muted" id="cnt">${d} of ${t} done</p><div class="progress"><span id="bar" style="width:${Math.round(d / t * 100)}%"></span></div></section>
+  ${c.groups.map(([g, items]) => `<section class="sec"><h2>${esc(g)}</h2><div class="list">${items.map((it) => { i++; return `<label class="check"><input type="checkbox" data-i="${i}"${saved[i] ? " checked" : ""}><span>${esc(it)}</span></label>`; }).join("")}</div></section>`).join("")}`;
+  document.querySelectorAll(".check input").forEach((box) => box.addEventListener("change", () => {
+    CHECKS[id] = Object.assign({}, CHECKS[id], { [box.dataset.i]: box.checked });
+    store.set("checks", CHECKS);
+    const [d2, t2] = checklistPct(id);
+    $("#cnt").textContent = `${d2} of ${t2} done`; $("#bar").style.width = Math.round(d2 / t2 * 100) + "%";
+    if (d2 === t2) toast("Checklist complete. You're officially moved in.");
+  }));
+}
+
+/* ---------- Me: profile and progress ---------- */
+const STATES = ["Alabama","Alaska","Arizona","Arkansas","California","Colorado","Connecticut","Delaware","District of Columbia","Florida","Georgia","Hawaii","Idaho","Illinois","Indiana","Iowa","Kansas","Kentucky","Louisiana","Maine","Maryland","Massachusetts","Michigan","Minnesota","Mississippi","Missouri","Montana","Nebraska","Nevada","New Hampshire","New Jersey","New Mexico","New York","North Carolina","North Dakota","Ohio","Oklahoma","Oregon","Pennsylvania","Rhode Island","South Carolina","South Dakota","Tennessee","Texas","Utah","Vermont","Virginia","Washington","West Virginia","Wisconsin","Wyoming"];
+const LIVING = ["Dorm", "Apartment", "House", "With family", "Other"];
+const STAGES = ["High school senior", "College student", "First job", "Moving out soon", "Just moved", "Other"];
+const opts = (list, v) => `<option value="">Choose one</option>` + list.map((x) => `<option${x === v ? " selected" : ""}>${esc(x)}</option>`).join("");
+function meView(){
+  const p = PROFILE;
+  app.innerHTML = `<section class="hello"><h1>Me</h1></section>
+  <section class="sec"><div class="card lvl"><span class="big">${DONE.length}</span><span><h3>Skills learned</h3><span class="muted small">${DONE.length ? "Finish a guide and tap I did it to add more." : "Finish any guide and tap I did it to start your count."}</span></span></div></section>
+  <section class="sec"><div class="sec-head"><h2>About you</h2></div>
+    <p class="muted small">This makes answers fit your life, like your state's rules or your exact car. It stays on this device.</p>
+    <form class="form" id="pf">
+      <label class="f">First name<input type="text" name="name" maxlength="30" value="${esc(p.name || "")}" autocomplete="given-name"></label>
+      <label class="f">State<select name="state">${opts(STATES, p.state)}</select></label>
+      <label class="f">Where you live<select name="living">${opts(LIVING, p.living)}</select></label>
+      <label class="f">Right now you're<select name="stage">${opts(STAGES, p.stage)}</select></label>
+      <fieldset style="border:0;padding:0;margin:0" class="stack"><legend class="f" style="font-weight:700;font-size:15.5px;margin-bottom:6px">Your car (optional)</legend>
+        <div class="two"><input type="text" name="carYear" inputmode="numeric" maxlength="4" placeholder="Year" aria-label="Car year" value="${esc(p.carYear || "")}"><input type="text" name="carMake" maxlength="20" placeholder="Make" aria-label="Car make" value="${esc(p.carMake || "")}"><input type="text" name="carModel" maxlength="24" placeholder="Model" aria-label="Car model" value="${esc(p.carModel || "")}"></div></fieldset>
+      <button class="btn" type="submit">Save</button>
+      <p class="muted small">Coming with Silver: upload your ID or car registration and Adulted fills this in for you.</p>
+    </form>
+  </section>
+  <section class="sec"><div class="sec-head"><h2>Your plan</h2><a href="#plans">Compare plans</a></div>
+    <div class="card"><b>${esc(tierName())}</b><p class="muted small">${tier() === "gold" ? "Unlimited Ask Anything questions." : `${asksLeft()} Ask Anything questions left today.`}</p></div></section>
+  <section class="sec"><h2>Privacy</h2>
+    <p class="muted small">Your profile, checklist, and progress stay on this device. When you use Ask Anything, your question and the profile details above (not your name) go to our server and Anthropic to write the answer. We don't store them.</p>
+    <button class="btn ghost" id="wipe">Delete my data on this device</button></section>`;
+  $("#pf").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const f = new FormData(e.target), next = {};
+    for (const [k, v] of f.entries()) { const t = String(v).trim(); if (t) next[k] = t; }
+    if (next.carYear && !/^(19|20)\d{2}$/.test(next.carYear)) delete next.carYear;
+    PROFILE = next; store.set("profile", PROFILE); toast("Saved");
+  });
+  $("#wipe").onclick = () => {
+    if (!confirm("Delete your profile, checklist, and progress from this device?")) return;
+    PROFILE = {}; DONE = []; CHECKS = {};
+    ["profile", "done", "checks", "recent", "asks", "draft"].forEach((k) => store.set(k, k === "profile" || k === "checks" ? {} : k === "asks" ? { day: "", n: 0 } : k === "draft" ? "" : []));
+    toast("Deleted"); meView();
+  };
+}
+
+/* ---------- Plans ---------- */
+function plansView(){
+  const cur = tier();
+  app.innerHTML = `<a class="back" href="#me">${ico("back", 18)} Me</a>
+  <section class="hello"><h1>Plans</h1><p class="muted">Free covers the everyday basics. Upgrade when you want more help.</p></section>
+  <section class="sec tiers">${TIERS.map((t) => `<div class="tier ${t.id}">
+    <div class="sec-head"><h2>${esc(t.n)}</h2>${t.id === cur ? `<span class="chip l1">Your plan</span>` : ""}</div>
+    <div><span class="price">${esc(t.price)}</span> ${t.alt ? `<span class="muted small">${esc(t.alt)}</span>` : ""}</div>
+    <p class="muted small">${esc(t.note)}</p>
+    <ul>${t.has.map(([f, live]) => `<li class="${live ? "" : "soon"}">${ico(live ? "check" : "lock", 20)}<span>${esc(f)}${live ? "" : "<em>Soon</em>"}</span></li>`).join("")}</ul>
+    ${t.id !== "free" && t.id !== cur ? `<button class="btn${t.id === "gold" ? "" : " ghost"} full" data-buy="${t.id}"${CONFIG.paymentsLive ? "" : " disabled"}>${CONFIG.paymentsLive ? `Start ${esc(t.n)}` : "Opens soon"}</button>` : ""}
+  </div>`).join("")}</section>
+  <section class="sec"><h2>Just need it once?</h2><p class="muted small">Buy a single use without subscribing.</p><div class="card pricelist">${ONE_TIME.map(([n, p]) => `<div><span>${esc(n)}</span><b>${money(p)}</b></div>`).join("")}</div></section>
+  <section class="sec"><h2>Top-ups for Silver</h2><div class="card pricelist">${TOPUPS.map(([n, p]) => `<div><span>${esc(n)}</span><b>${money(p)}</b></div>`).join("")}<div><span>Any single Gold feature</span><b>25% off</b></div></div>
+    <p class="muted small">Students get Silver for ${money(CONFIG.studentSilverYearly)} a year with a school email. Gold Family covers up to 5 people for ${money(CONFIG.familyGoldYearly)} a year.</p></section>
+  ${CONFIG.paymentsLive ? "" : `<p class="muted small" style="margin-top:20px">Paid plans open when the app launches on Google Play. Everything on Free works now.</p>`}`;
+}
+
+/* ---------- routing ---------- */
+const TABS = [["", "home", "Home"], ["learn", "book", "Learn"], ["ask", "chat", "Ask"], ["help", "sos", "Help"], ["me", "user", "Me"]];
+function drawTabs(h){
+  const g = h.startsWith("g-") ? GUIDES[h.slice(2)] : null;
+  const active = h === "learn" || h.startsWith("m-") || h.startsWith("list-") ? "learn" : h === "ask" ? "ask" : h === "help" || (g && g.urgent) ? "help" : h === "me" || h === "plans" ? "me" : g ? "learn" : "";
+  $("#tabs").innerHTML = TABS.map(([k, ic, l]) => `<a href="#${k}"${k === "help" ? ' class="sos"' : ""}${k === active ? ' aria-current="page"' : ""}>${ico(ic, 24)}<span>${l}</span></a>`).join("");
+  $("#planChip").textContent = tierName();
+}
+function route(){
+  const h = decodeURIComponent(location.hash.slice(1));
+  drawTabs(h);
+  if (h.startsWith("g-")) guideView(h.slice(2));
+  else if (h.startsWith("m-")) moduleView(h.slice(2));
+  else if (h.startsWith("list-")) checklistView(h.slice(5));
+  else if (h === "learn") learnView();
+  else if (h === "ask") askView();
+  else if (h === "help") helpView();
+  else if (h === "me") meView();
+  else if (h === "plans") plansView();
+  else homeView();
+  window.scrollTo(0, 0);
+}
+window.addEventListener("hashchange", route);
+route();
+</script>

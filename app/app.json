@@ -1,0 +1,43 @@
+{
+  "expo": {
+    "name": "Adulted",
+    "slug": "adulted",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "backgroundColor": "#F1F4F7",
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.matthewsfiled.adulted",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#16212E",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "package": "com.matthewsfiled.adulted",
+      "blockedPermissions": [
+        "com.google.android.gms.permission.AD_ID"
+      ]
+    },
+    "plugins": [
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/splash-icon.png",
+          "imageWidth": 180,
+          "resizeMode": "contain",
+          "backgroundColor": "#F1F4F7"
+        }
+      ]
+    ],
+    "scheme": "adulted",
+    "owner": "matthewsfiled"
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "name": "adulted",
+  "private": true,
+  "description": "Adulted: life skills nobody taught you. Website + web app + AI server (server/), phone app (app/), guides and prompts (shared/), screens (web/).",
+  "scripts": {
+    "build": "node scripts/build-web.js && cd server && npm ci --omit=dev",
+    "start": "cd server && npm start",
+    "test": "node scripts/build-web.js --check && cd shared && npm test && cd ../server && npm test"
+  },
+  "engines": { "node": ">=20" }
+}
