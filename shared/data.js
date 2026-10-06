@@ -204,10 +204,159 @@
       ],
       related: [],
     },
+
+    /* ---------- Murphy's Law: when it goes wrong and you're on your own ---------- */
+    kitchenfire: {
+      n: "Grease fire on the stove", mod: "ready", group: "crisis", cat: "Fire", time: "Right now", level: 3, urgent: true,
+      tools: ["A metal lid or baking sheet", "Fire extinguisher, if you have one"],
+      safety: "Never throw water on a grease fire. It makes the fire explode outward.",
+      steps: [
+        { t: "Turn off the burner", d: "Only if you can reach the knob safely.", v: "stoveOff" },
+        { t: "Cover it with a lid", d: "Slide a metal lid or baking sheet over the pan and leave it there.", more: "No air means no fire. Don't lift the lid to check for a while.", v: "lid" },
+        { t: "Never use water", d: "Water on burning oil throws the fire everywhere.", v: "noWater" },
+        { t: "Don't carry the pan", d: "Moving it spills burning oil on you and the floor.", v: "noCarry" },
+        { t: "Still burning? Get out", d: "Leave, close the door behind you, and call 911 from outside.", v: "exit" },
+      ],
+      pro: "Oven or microwave fire: keep the door shut and turn it off. If it doesn't go out fast, leave and call 911.",
+      related: ["housefire"],
+    },
+    housefire: {
+      n: "Fire in your home", mod: "ready", group: "crisis", cat: "Fire", time: "Right now", level: 3, urgent: true,
+      tools: [],
+      safety: "Get out first. Nothing you own is worth going back for.",
+      steps: [
+        { t: "Get out now", d: "Yell \"Fire!\" to wake others and leave. Don't stop to grab things.", v: "exit" },
+        { t: "Stay low", d: "Smoke rises. Crawl under it where the air is cleaner.", v: "crawl" },
+        { t: "Feel doors first", d: "Touch the door with the back of your hand. If it's hot, use another way out.", v: "doorHand" },
+        { t: "Close doors behind you", d: "A closed door slows the fire and smoke down.", v: "doorClose" },
+        { t: "Call 911 from outside", d: "Never go back in. Tell firefighters if anyone is still inside.", v: "phone" },
+      ],
+      pro: "Make an escape plan now: know two ways out of every room.",
+      related: ["kitchenfire", "coalarm"],
+    },
+    coalarm: {
+      n: "Carbon monoxide alarm going off", mod: "ready", group: "crisis", cat: "Air", time: "Right now", level: 3, urgent: true,
+      tools: [],
+      safety: "Carbon monoxide has no smell. If the alarm sounds, believe it.",
+      steps: [
+        { t: "Get outside now", d: "Get everyone and pets out to fresh air. Leave the door open.", v: "exit" },
+        { t: "Call 911", d: "Call from outside, especially if anyone has a headache, dizziness, or nausea.", v: "phone" },
+        { t: "Stay out", d: "Don't go back in until firefighters or the gas company say it's safe.", v: "check" },
+      ],
+      pro: "Every home with gas appliances or an attached garage needs a carbon monoxide alarm on each floor.",
+      related: ["housefire", "gas"],
+    },
+    storm: {
+      n: "A big storm is coming", mod: "ready", group: "crisis", cat: "Weather", time: "A day ahead", level: 2, urgent: true,
+      tools: ["Your home emergency kit"],
+      safety: "Follow evacuation orders right away. Roads get crowded and dangerous fast.",
+      steps: [
+        { t: "Charge everything", d: "Phone, power bank, and laptop. Keep them charged until the storm passes.", v: "battery" },
+        { t: "Get water and food", d: "At least 1 gallon of water per person per day for several days, plus food that needs no cooking.", v: "kit" },
+        { t: "Fill your gas tank", d: "Gas stations may lose power or run out.", v: "car" },
+        { t: "Bring things inside", d: "Patio furniture, grills, and trash cans can become flying debris.", v: "trash" },
+        { t: "Know your plan", d: "Look up your evacuation zone and where you'd go. Tell someone your plan.", v: "phone" },
+      ],
+      related: ["outage"],
+    },
+    hurtalone: {
+      n: "Hurt or sick and home alone", mod: "ready", group: "crisis", cat: "Health", time: "Right now", level: 3, urgent: true,
+      tools: [],
+      safety: "If it might be serious, call 911. Don't wait to see if it gets better.",
+      steps: [
+        { t: "Call 911 if it's serious", d: "Chest pain, trouble breathing, a bad fall, heavy bleeding, or feeling like you'll pass out.", v: "phone" },
+        { t: "Unlock the door", d: "If you can, unlock it so help can get in.", v: "lock" },
+        { t: "Text someone", d: "Tell a friend or family member what's happening and where you are.", v: "phone" },
+        { t: "Set up your medical ID", d: "Add allergies, medicines, and an emergency contact on your phone's lock screen.", more: "Responders check it first. On iPhone it's in the Health app. On Android, look for Emergency information in Settings.", v: "check" },
+      ],
+      pro: "Not an emergency but not sure? Urgent care or your doctor's nurse line can tell you if you need to come in.",
+      related: [],
+    },
+
+    /* ---------- Step in: help someone else ---------- */
+    choking: {
+      n: "Someone is choking", mod: "ready", group: "stepin", cat: "Step in", time: "Right now", level: 3, urgent: true,
+      tools: [],
+      safety: "If they can cough hard or talk, let them keep coughing. Step in only if they can't.",
+      steps: [
+        { t: "Ask \"Are you choking?\"", d: "If they can't talk, cough, or breathe, act now.", v: "askPerson" },
+        { t: "Get 911 called", d: "Point at someone and tell them to call 911. If you're alone, call on speaker.", v: "phone" },
+        { t: "Give 5 back blows", d: "Lean them forward. Hit hard between the shoulder blades with the heel of your hand.", v: "backBlow" },
+        { t: "Give 5 abdominal thrusts", d: "Fist just above the belly button, other hand over it. Pull in and up, hard.", v: "thrust" },
+        { t: "Keep switching", d: "5 back blows, then 5 thrusts, until the object comes out.", v: "check" },
+        { t: "If they pass out, start CPR", d: "Lower them to the floor and start chest compressions.", v: "cpr" },
+      ],
+      pro: "Take a CPR and first aid class. The Red Cross and American Heart Association run them near you.",
+      related: ["cpr"],
+    },
+    cpr: {
+      n: "Someone collapsed and isn't breathing", mod: "ready", group: "stepin", cat: "Step in", time: "Right now", level: 3, urgent: true,
+      tools: [],
+      safety: "Hands-only CPR is for adults and teens who collapse and aren't breathing normally.",
+      steps: [
+        { t: "Check and shout", d: "Make sure the area is safe. Tap their shoulder and shout \"Are you OK?\"", v: "askPerson" },
+        { t: "Call 911", d: "Put the phone on speaker. Send someone to find an AED (the defibrillator in public places).", v: "phone" },
+        { t: "Push hard and fast", d: "Both hands in the center of the chest. Push 2 inches deep, 100 to 120 times a minute.", more: "That's the beat of the song \"Stayin' Alive.\" Let the chest come all the way back up between pushes.", v: "cpr" },
+        { t: "Use the AED", d: "Turn it on and do what it says. It talks you through every step.", v: "aed" },
+        { t: "Don't stop", d: "Keep going until help takes over or the person starts breathing.", v: "check" },
+      ],
+      pro: "A 2-hour CPR class makes you ready to save a life. Search \"CPR class near me\" on the Red Cross or American Heart Association site.",
+      related: ["choking"],
+    },
+    seizure: {
+      n: "Someone is having a seizure", mod: "ready", group: "stepin", cat: "Step in", time: "Right now", level: 3, urgent: true,
+      tools: [],
+      safety: "Never put anything in their mouth, and never hold them down.",
+      steps: [
+        { t: "Stay calm and time it", d: "Look at the clock when it starts.", v: "timer" },
+        { t: "Clear the area", d: "Move hard or sharp things away. Put something soft under their head.", v: "towels" },
+        { t: "Turn them on their side", d: "This keeps their airway clear. Loosen anything tight around the neck.", v: "sideLay" },
+        { t: "Stay until they're awake", d: "Talk calmly as they come to. They may be confused for a while.", v: "askPerson" },
+        { t: "Know when to call 911", d: "Over 5 minutes, another seizure, trouble breathing, hurt, in water, or a first seizure.", v: "phone" },
+      ],
+      related: ["cpr"],
+    },
+    bleeding: {
+      n: "Someone is bleeding badly", mod: "ready", group: "stepin", cat: "Step in", time: "Right now", level: 3, urgent: true,
+      tools: ["Clean cloth or gauze", "Gloves, if you have them"],
+      safety: "Call 911 for bleeding that won't stop, spurts, or soaks through cloth fast.",
+      steps: [
+        { t: "Call 911", d: "Or tell someone nearby to call while you help.", v: "phone" },
+        { t: "Press hard", d: "Put a cloth on the wound and press down firmly with both hands.", v: "press" },
+        { t: "Don't lift to check", d: "If blood soaks through, add more cloth on top and keep pressing.", v: "press" },
+        { t: "Keep pressing until help arrives", d: "Steady pressure is what stops most bleeding.", v: "check" },
+      ],
+      pro: "A free Stop the Bleed class teaches pressure, wound packing, and tourniquets in about an hour.",
+      related: ["cpr"],
+    },
+    crash: {
+      n: "You see a car crash", mod: "ready", group: "stepin", cat: "Step in", time: "Right now", level: 3, urgent: true,
+      tools: [],
+      safety: "Don't become a second victim. Only stop where it's safe.",
+      steps: [
+        { t: "Pull over safely", d: "Park well past the crash with your hazard lights on.", v: "car" },
+        { t: "Call 911", d: "Give the road, direction, nearest exit or landmark, and how many cars.", v: "phone" },
+        { t: "Don't move anyone", d: "Moving someone can hurt their neck or back. Only move them away from fire or traffic.", v: "noCarry" },
+        { t: "Talk to them", d: "Ask if they're OK, tell them help is coming, and keep them still.", v: "askPerson" },
+        { t: "Help with bleeding", d: "Press on any heavy bleeding with a cloth until help arrives.", v: "press" },
+      ],
+      related: ["bleeding", "cpr"],
+    },
   };
 
   /* Panic button: urgent guides first, then any related guide */
-  const PANIC = ["gas", "shutoff", "toilet", "outage", "lockout", "smoke"];
+  const PANIC = ["gas", "housefire", "kitchenfire", "coalarm", "shutoff", "toilet", "outage", "lockout", "smoke"];
+
+  /* Murphy's Law: what can go wrong to you, and when to step in for someone else */
+  const READY = {
+    crisis: ["housefire", "kitchenfire", "coalarm", "storm", "hurtalone", "outage", "shutoff", "gas", "lockout"],
+    stepin: ["cpr", "choking", "bleeding", "seizure", "crash"],
+    kits: ["homekit", "carkit", "firstaid", "gobag"],
+    classes: [
+      { n: "CPR and first aid class", where: "American Red Cross or American Heart Association", url: "https://www.redcross.org/take-a-class" },
+      { n: "Stop the Bleed class", where: "Free classes near you", url: "https://www.stopthebleed.org" },
+    ],
+  };
 
   const RESOURCES = [
     { n: "Emergency", num: "911", note: "Fire, crime, medical emergency, or anyone in danger" },
@@ -228,6 +377,37 @@
         ["First month", ["Set up autopay or a reminder for rent", "Make a simple budget", "Save your landlord's and maintenance contacts", "Put together a basic toolkit and first aid kit"]],
       ],
     },
+    homekit: {
+      n: "Home emergency kit", kit: true, blurb: "Enough to get by for 3 days with no power or water",
+      groups: [
+        ["Water and food", ["Water: 1 gallon per person per day, for at least 3 days", "Food that needs no cooking for 3 days", "Manual can opener"]],
+        ["Light and power", ["Flashlight", "Extra batteries", "Power bank, charged", "Battery or hand-crank radio"]],
+        ["Safety", ["Smoke alarms tested this month", "Carbon monoxide alarm", "Fire extinguisher (know where it is)", "Whistle to signal for help"]],
+        ["Personal", ["A week of any medicines you take", "Copies of ID and insurance cards", "Some cash in small bills", "Phone numbers written on paper"]],
+      ],
+    },
+    carkit: {
+      n: "Car emergency kit", kit: true, blurb: "For breakdowns, flat tires, and getting stuck",
+      groups: [
+        ["Car trouble", ["Jumper cables", "Tire pressure gauge", "Spare tire, checked", "Reflective triangles or flares"]],
+        ["Getting stuck", ["Water and snacks", "Blanket", "Phone charger for the car", "Flashlight"]],
+        ["Winter", ["Ice scraper and brush", "Small shovel", "Sand or kitty litter for traction"]],
+      ],
+    },
+    firstaid: {
+      n: "First aid kit", kit: true, blurb: "For cuts, burns, and sprains at home",
+      groups: [
+        ["Wounds", ["Bandages in different sizes", "Gauze pads and tape", "Antiseptic wipes", "Disposable gloves"]],
+        ["Other", ["Pain reliever", "Tweezers", "Instant cold pack", "Emergency blanket", "Thermometer"]],
+      ],
+    },
+    gobag: {
+      n: "Go-bag", kit: true, blurb: "Grab it and leave in 5 minutes if you have to evacuate",
+      groups: [
+        ["Essentials", ["Water and snacks", "Phone charger and power bank", "A few days of medicines", "Copies of ID and important papers"]],
+        ["Comfort", ["Change of clothes", "Toothbrush and basic toiletries", "Flashlight", "Cash"]],
+      ],
+    },
   };
 
   /* One tip a day on Home, same for everyone that day */
@@ -242,8 +422,13 @@
     "Wet laundry left sitting starts to smell in a few hours. Set a timer.",
     "Write your landlord's maintenance number in your phone now.",
     "Renters insurance often costs less than a pizza a month.",
+    "Murphy's Law: anything that can go wrong will go wrong. Check your home emergency kit this week.",
+    "Know two ways out of every room in your home.",
+    "A 2-hour CPR class could let you save someone's life.",
+    "Never throw water on a grease fire. Cover it with a lid.",
+    "Add an emergency contact to your phone's lock screen today.",
   ];
   const dayIndex = (ymd, n) => { const [y, m, d] = String(ymd).split("-").map(Number); return Math.floor(Date.UTC(y, m - 1, d) / 864e5) % n; };
 
-  return { CONFIG, TIERS, ONE_TIME, TOPUPS, MODULES, GUIDES, PANIC, RESOURCES, CHECKLISTS, TIPS, dayIndex };
+  return { CONFIG, TIERS, ONE_TIME, TOPUPS, MODULES, GUIDES, PANIC, READY, RESOURCES, CHECKLISTS, TIPS, dayIndex };
 });

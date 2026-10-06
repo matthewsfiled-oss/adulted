@@ -41,3 +41,9 @@ test('emergency numbers are right', () => {
   assert.equal(nums['988 Suicide and Crisis Lifeline'], '988');
   assert.equal(nums['Poison Control'], '1-800-222-1222');
 });
+
+test("Murphy's Law section points at real guides and kits", () => {
+  for (const id of [...D.READY.crisis, ...D.READY.stepin]) assert.ok(D.GUIDES[id], id);
+  for (const id of D.READY.kits) assert.ok(D.CHECKLISTS[id] && D.CHECKLISTS[id].kit, id);
+  for (const id of D.READY.stepin) assert.ok(D.GUIDES[id].steps.some((s) => /911/.test(s.t + s.d)), `${id} must tell people to call 911`);
+});

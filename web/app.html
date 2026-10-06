@@ -65,6 +65,14 @@ p{margin:0}
 .sos-band .row3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
 .sos-band .row3 a{background:#fff;color:var(--ink);text-decoration:none;font-weight:700;font-size:15px;border-radius:10px;padding:10px 6px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:4px;line-height:1.2}
 .sos-band .more{color:#fff;font-weight:700;font-size:15px}
+.murphy{display:grid;grid-template-columns:auto minmax(0,1fr);gap:14px;align-items:center;background:var(--ink);color:#fff;border-radius:16px;padding:16px;text-decoration:none}
+.murphy h3{color:#fff;font-size:20px}
+.murphy .score{font-family:var(--display);font-stretch:125%;font-weight:900;font-size:34px;line-height:1;background:var(--amber);color:var(--ink);border-radius:12px;padding:12px 10px;text-align:center;min-width:84px}
+.murphy .score small{font-size:13px;font-weight:700;display:block;margin-top:2px}
+.murphy-head p{font-size:18px}
+.sos-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.sos-grid a{display:flex;gap:10px;align-items:center;background:var(--card);border:2px solid var(--red);border-radius:12px;padding:10px;text-decoration:none;color:var(--ink);font-weight:700;font-size:15.5px;line-height:1.2}
+.sos-grid .ic{flex:none;width:34px;height:34px;border-radius:50%;background:var(--red);color:#fff;display:grid;place-items:center}
 .tip{background:var(--amber-soft);border-left:6px solid var(--amber);border-radius:4px 12px 12px 4px;padding:14px 16px;display:flex;gap:12px;align-items:flex-start}
 .tip b{display:block;font-size:14px;color:var(--amber-ink)}
 
@@ -226,7 +234,8 @@ const ICONS = {
 };
 const ico = (n, s = 22, w = 2.2) => `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[n] || ""}</svg>`;
 const MOD_ICON = { home: "home", money: "wallet", living: "door", food: "food", health: "heart", car: "car" };
-const PANIC_ICON = { gas: "flame", shutoff: "drop", toilet: "toilet", outage: "bolt", lockout: "key", smoke: "bell" };
+const PANIC_ICON = { gas: "flame", housefire: "flame", kitchenfire: "flame", coalarm: "bell", shutoff: "drop", toilet: "toilet", outage: "bolt", lockout: "key", smoke: "bell", storm: "bolt", hurtalone: "heart" };
+const SHORT = { gas: "I smell gas", housefire: "Fire", kitchenfire: "Grease fire", coalarm: "CO alarm", shutoff: "Water leak", toilet: "Toilet overflowing", outage: "Power out", lockout: "Locked out", smoke: "Alarm chirping", hurtalone: "Hurt and alone" };
 const LEVEL = { 1: ["Easy", "l1"], 2: ["Take your time", "l2"], 3: ["Act fast", "l3"] };
 
 /* ---------- saved data: this device only (the phone app keeps it in its own storage) ---------- */
@@ -285,9 +294,24 @@ const homeGuides = () => Object.keys(GUIDES).filter((id) => GUIDES[id].mod === "
 function checklistPct(id){ const all = CHECKLISTS[id].groups.flatMap(([, items]) => items); const c = CHECKS[id] || {}; return [all.filter((_, i) => c[i]).length, all.length]; }
 
 /* ---------- Home ---------- */
+/* A different tip every time Home opens, never the same one twice in a row */
+function nextTip(){
+  const last = store.get("lastTip", -1);
+  let i = Math.floor(Math.random() * TIPS.length);
+  if (TIPS.length > 1 && i === last) i = (i + 1) % TIPS.length;
+  store.set("lastTip", i);
+  return TIPS[i];
+}
+/* Ready score: how prepared someone is for Murphy's Law, from 0 to 100 */
+function readyScore(){
+  const kits = READY.kits.map(checklistPct), have = kits.reduce((n, [d]) => n + d, 0), all = kits.reduce((n, [, t]) => n + t, 0);
+  const stepin = READY.stepin.filter((id) => DONE.includes(id)).length / READY.stepin.length;
+  const crisis = READY.crisis.filter((id) => DONE.includes(id)).length / READY.crisis.length;
+  return Math.round((have / all) * 50 + stepin * 30 + crisis * 20);
+}
 function homeView(){
   const name = (PROFILE.name || "").trim();
-  const tip = TIPS[dayIndex(todayStr(), TIPS.length)];
+  const tip = nextTip();
   const [done, total] = checklistPct("apartment");
   const rec = recent();
   app.innerHTML = `
@@ -301,10 +325,11 @@ function homeView(){
     <section class="sec"><div class="sos-band">
       <h2>Something wrong right now?</h2>
       <div class="row3">${["gas", "shutoff", "lockout"].map((id) => `<a href="#g-${id}">${ico(PANIC_ICON[id], 24)}${esc({ gas: "I smell gas", shutoff: "Water leak", lockout: "Locked out" }[id])}</a>`).join("")}</div>
-      <a class="more" href="#help">More emergencies and numbers to call</a>
+      <a class="more" href="#help">More emergencies, Murphy's Law, and numbers to call</a>
     </div></section>
     ${rec.length ? `<section class="sec"><div class="sec-head"><h2>Pick up where you left off</h2></div><div class="list">${rec.slice(0, 2).map(guideRow).join("")}</div></section>` : ""}
-    <section class="sec"><div class="tip">${ico("bulb", 24)}<p><b>Today's tip</b>${esc(tip)}</p></div></section>
+    <section class="sec"><div class="tip">${ico("bulb", 24)}<p><b>Tip</b>${esc(tip)}</p></div></section>
+    <section class="sec"><a class="murphy" href="#help"><span class="score">${readyScore()}<small>/100</small></span><span><h3>Murphy's Law</h3><span class="small">Anything that can go wrong will go wrong. See your Ready score and what to keep around.</span></span></a></section>
     <section class="sec"><div class="sec-head"><h2>Your first apartment</h2><a href="#list-apartment">Open checklist</a></div>
       <a class="card stack" href="#list-apartment" style="text-decoration:none;color:inherit"><p>${done ? `${done} of ${total} done. Keep going.` : "Everything to do before you sign, on move-in day, and in your first month."}</p><div class="progress"><span style="width:${Math.round(done / total * 100)}%"></span></div></a>
     </section>
@@ -329,7 +354,7 @@ function modsGrid(){
 function learnView(){
   app.innerHTML = `<section class="hello"><h1>Learn the basics</h1><p class="muted">Short guides with a picture for every step. Start with what you need today.</p></section>
   <section class="sec">${modsGrid()}</section>
-  <section class="sec"><div class="sec-head"><h2>Checklists</h2></div><div class="list">${Object.keys(CHECKLISTS).map((id) => { const [d, t] = checklistPct(id); return `<a class="row" href="#list-${id}"><span class="thumb">${ico("list", 26)}</span><span><span class="nm">${esc(CHECKLISTS[id].n)}</span><br><span class="sub">${d} of ${t} done</span></span><span class="go">Open</span></a>`; }).join("")}</div></section>`;
+  <section class="sec"><div class="sec-head"><h2>Checklists</h2></div><div class="list">${Object.keys(CHECKLISTS).filter((id) => !CHECKLISTS[id].kit).map((id) => { const [d, t] = checklistPct(id); return `<a class="row" href="#list-${id}"><span class="thumb">${ico("list", 26)}</span><span><span class="nm">${esc(CHECKLISTS[id].n)}</span><br><span class="sub">${d} of ${t} done</span></span><span class="go">Open</span></a>`; }).join("")}</div></section>`;
 }
 function moduleView(id){
   const m = MODULES.find((x) => x.id === id);
@@ -361,7 +386,7 @@ function guideView(id){
   addRecent(id);
   const [lvl, cls] = LEVEL[g.level] || LEVEL[1];
   const n = g.steps.length;
-  const backTo = g.urgent ? ["#help", "Help"] : ["#m-" + g.mod, ((MODULES.find((m) => m.id === g.mod) || {}).n || "All") + " guides"];
+  const backTo = g.urgent ? ["#help", "Ready"] : ["#m-" + g.mod, ((MODULES.find((m) => m.id === g.mod) || {}).n || "All") + " guides"];
   app.innerHTML = `<a class="back" href="${backTo[0]}">${ico("back", 18)} ${esc(backTo[1])}</a>
   <section class="ghead">
     <h1 style="font-size:clamp(28px,7.4vw,38px)">${esc(g.n)}</h1>
@@ -495,8 +520,29 @@ function outOfAsks(){
 
 /* ---------- Help: emergencies and numbers ---------- */
 function helpView(){
-  app.innerHTML = `<section class="hello"><h1>Something wrong right now?</h1><p class="muted">Pick what's happening. Each one starts with what to do first.</p></section>
-  <section class="sec panic">${PANIC.map((id) => `<a href="#g-${id}"><span class="ic">${ico(PANIC_ICON[id], 22)}</span><span>${esc(GUIDES[id].n)}</span>${ico("next", 20)}</a>`).join("")}</section>
+  const score = readyScore();
+  const level = score >= 80 ? "Ready for anything" : score >= 40 ? "Getting there" : "Just starting";
+  app.innerHTML = `<section class="hello"><h1>Something wrong right now?</h1><p class="muted">Tap what's happening. Each one starts with what to do first.</p></section>
+  <section class="sec"><div class="sos-grid">${PANIC.concat("hurtalone").map((id) => `<a href="#g-${id}"><span class="ic">${ico(PANIC_ICON[id], 20)}</span><span>${esc(SHORT[id] || GUIDES[id].n)}</span></a>`).join("")}</div>
+    <a class="btn full" href="tel:911" style="background:var(--red);border-color:var(--red)">${ico("phone")} Call 911</a></section>
+
+  <section class="sec murphy-head">
+    <h2 style="font-size:28px">Murphy's Law</h2>
+    <p>Anything that can go wrong will go wrong. Living on your own, nobody else is there to handle it. Be the person who knows what to do, for yourself and for whoever needs help.</p>
+    <div class="card lvl"><span class="big">${score}</span><span><h3>Ready score: ${level}</h3><span class="muted small">Build your kits, learn the crisis guides, and learn to step in. Tap I did it on each guide to raise your score.</span></span></div>
+  </section>
+
+  <section class="sec"><div class="sec-head"><h2>Keep it around</h2></div><p class="muted small">Stock these before you need them. Check items off as you get them.</p>
+    <div class="list">${READY.kits.map((id) => { const [d, t] = checklistPct(id), c = CHECKLISTS[id]; return `<a class="row" href="#list-${id}"><span class="thumb">${ico(id === "carkit" ? "car" : id === "firstaid" ? "heart" : id === "gobag" ? "door" : "home", 26)}</span><span><span class="nm">${esc(c.n)}</span><br><span class="sub">${esc(c.blurb)}. ${d} of ${t} items.</span></span><span class="go">${d === t ? "Done" : "Build it"}</span></a>`; }).join("")}</div></section>
+
+  <section class="sec"><div class="sec-head"><h2>When it happens to you</h2></div><p class="muted small">Go through these once now so you know them when it counts.</p>
+    <div class="list">${READY.crisis.map(guideRow).join("")}</div></section>
+
+  <section class="sec"><div class="sec-head"><h2>Step in</h2></div><p class="muted small">Most people freeze. Be the one who helps until the ambulance gets there.</p>
+    <div class="list">${READY.stepin.map(guideRow).join("")}</div>
+    <div class="card stack"><h3>Get trained for real</h3><p class="muted small">A guide gets you started. A class makes you ready. Most take one to two hours.</p>
+      ${READY.classes.map((c) => `<a class="btn ghost full" href="${esc(c.url)}" target="_blank" rel="noopener">${esc(c.n)}</a><p class="small muted" style="margin-top:-4px">${esc(c.where)}</p>`).join("")}</div></section>
+
   <section class="sec"><h2>Numbers to call</h2><div class="list">${RESOURCES.map((r) => `<div class="call"><span><b>${esc(r.n)}</b><br><span class="small muted">${esc(r.note)}</span></span><a class="num" href="tel:${r.num.replace(/[^0-9]/g, "")}">${ico("phone", 16)} ${esc(r.num)}</a></div>`).join("")}</div></section>`;
 }
 
@@ -507,15 +553,15 @@ function checklistView(id){
   const saved = CHECKS[id] || {};
   let i = -1;
   const [d, t] = checklistPct(id);
-  app.innerHTML = `<a class="back" href="#learn">${ico("back", 18)} Learn</a>
-  <section class="hello"><h1>${esc(c.n)} checklist</h1><p class="muted" id="cnt">${d} of ${t} done</p><div class="progress"><span id="bar" style="width:${Math.round(d / t * 100)}%"></span></div></section>
+  app.innerHTML = `<a class="back" href="${c.kit ? "#help" : "#learn"}">${ico("back", 18)} ${c.kit ? "Ready" : "Learn"}</a>
+  <section class="hello"><h1>${esc(c.n)}${c.kit ? "" : " checklist"}</h1>${c.blurb ? `<p>${esc(c.blurb)}.</p>` : ""}<p class="muted" id="cnt">${d} of ${t} done</p><div class="progress"><span id="bar" style="width:${Math.round(d / t * 100)}%"></span></div></section>
   ${c.groups.map(([g, items]) => `<section class="sec"><h2>${esc(g)}</h2><div class="list">${items.map((it) => { i++; return `<label class="check"><input type="checkbox" data-i="${i}"${saved[i] ? " checked" : ""}><span>${esc(it)}</span></label>`; }).join("")}</div></section>`).join("")}`;
   document.querySelectorAll(".check input").forEach((box) => box.addEventListener("change", () => {
     CHECKS[id] = Object.assign({}, CHECKS[id], { [box.dataset.i]: box.checked });
     store.set("checks", CHECKS);
     const [d2, t2] = checklistPct(id);
     $("#cnt").textContent = `${d2} of ${t2} done`; $("#bar").style.width = Math.round(d2 / t2 * 100) + "%";
-    if (d2 === t2) toast("Checklist complete. You're officially moved in.");
+    if (d2 === t2) toast(c.kit ? `${c.n} complete. You're ready.` : "Checklist complete. You're officially moved in.");
   }));
 }
 
@@ -581,10 +627,11 @@ function plansView(){
 }
 
 /* ---------- routing ---------- */
-const TABS = [["", "home", "Home"], ["learn", "book", "Learn"], ["ask", "chat", "Ask"], ["help", "sos", "Help"], ["me", "user", "Me"]];
+const TABS = [["", "home", "Home"], ["learn", "book", "Learn"], ["ask", "chat", "Ask"], ["help", "sos", "Ready"], ["me", "user", "Me"]];
 function drawTabs(h){
   const g = h.startsWith("g-") ? GUIDES[h.slice(2)] : null;
-  const active = h === "learn" || h.startsWith("m-") || h.startsWith("list-") ? "learn" : h === "ask" ? "ask" : h === "help" || (g && g.urgent) ? "help" : h === "me" || h === "plans" ? "me" : g ? "learn" : "";
+  const kit = h.startsWith("list-") && CHECKLISTS[h.slice(5)] && CHECKLISTS[h.slice(5)].kit;
+  const active = kit ? "help" : h === "learn" || h.startsWith("m-") || h.startsWith("list-") ? "learn" : h === "ask" ? "ask" : h === "help" || (g && g.urgent) ? "help" : h === "me" || h === "plans" ? "me" : g ? "learn" : "";
   $("#tabs").innerHTML = TABS.map(([k, ic, l]) => `<a href="#${k}"${k === "help" ? ' class="sos"' : ""}${k === active ? ' aria-current="page"' : ""}>${ico(ic, 24)}<span>${l}</span></a>`).join("");
   $("#planChip").textContent = tierName();
 }
