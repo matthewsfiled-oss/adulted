@@ -545,7 +545,7 @@ function meView(){
     <div class="card"><b>${esc(tierName())}</b><p class="muted small">${tier() === "gold" ? "Unlimited Ask Anything questions." : `${asksLeft()} Ask Anything questions left today.`}</p></div></section>
   <section class="sec"><h2>Privacy</h2>
     <p class="muted small">Your profile, checklist, and progress stay on this device. When you use Ask Anything, your question and the profile details above (not your name) go to our server and Anthropic to write the answer. We don't store them.</p>
-    <button class="btn ghost" id="wipe">Delete my data on this device</button></section>`;
+    <button class="btn ghost" id="wipe">Delete my data on this device</button><div id="wipeAsk" class="card stack" hidden><p>Delete your profile, checklist, and progress from this device? This can't be undone.</p><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" id="wipeYes" style="background:var(--red);border-color:var(--red)">Delete everything</button><button class="btn ghost" id="wipeNo">Keep my data</button></div></div></section>`;
   $("#pf").addEventListener("submit", (e) => {
     e.preventDefault();
     const f = new FormData(e.target), next = {};
@@ -553,8 +553,9 @@ function meView(){
     if (next.carYear && !/^(19|20)\d{2}$/.test(next.carYear)) delete next.carYear;
     PROFILE = next; store.set("profile", PROFILE); toast("Saved");
   });
-  $("#wipe").onclick = () => {
-    if (!confirm("Delete your profile, checklist, and progress from this device?")) return;
+  $("#wipe").onclick = () => { $("#wipeAsk").hidden = false; $("#wipe").hidden = true; };
+  $("#wipeNo").onclick = () => { $("#wipeAsk").hidden = true; $("#wipe").hidden = false; };
+  $("#wipeYes").onclick = () => {
     PROFILE = {}; DONE = []; CHECKS = {};
     ["profile", "done", "checks", "recent", "asks", "draft"].forEach((k) => store.set(k, k === "profile" || k === "checks" ? {} : k === "asks" ? { day: "", n: 0 } : k === "draft" ? "" : []));
     toast("Deleted"); meView();
