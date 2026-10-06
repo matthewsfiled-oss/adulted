@@ -47,7 +47,7 @@
       tools: ["Detergent", "A laundry basket"],
       steps: [
         { t: "Check the tags", d: "Look for anything that says hand wash or dry clean only, and set it aside.", more: "Not sure what the symbols mean? Open the care label guide from the end of this guide.", v: "label" },
-        { t: "Sort into piles", d: "Darks, lights, and whites. Wash towels and jeans apart from thin shirts.", more: "New dark or red clothes can bleed color the first few washes, so keep them with darks.", v: "sort" },
+        { t: "Sort into piles", d: "Darks, lights, and whites. Wash towels and jeans apart from thin shirts.", more: "New dark or red clothes can bleed color the first few washes, so keep them with darks.", v: "sort", img: "laundry-2.jpg", alt: "Hands sorting clothes into piles on the floor" },
         { t: "Empty pockets", d: "Pull out tissues, pens, and cash. Zip zippers and close hooks.", more: "One forgotten tissue leaves lint on the whole load. A pen can ruin it.", v: "pockets", img: "laundry-3.jpg", alt: "A hand reaching into a jeans pocket" },
         { t: "Load it loosely", d: "Fill the drum about three-quarters full. Clothes need room to move.", more: "An overstuffed washer doesn't get clothes clean and can damage the machine.", v: "load", img: "laundry-4.jpg", alt: "Loading clothes into a front-loading washer" },
         { t: "Add detergent", d: "Pods go in the drum before the clothes. Liquid goes in the dispenser, filled to the line on the cap.", more: "If your washer has the HE symbol, use detergent that also says HE. More detergent doesn't mean cleaner clothes, it leaves residue.", v: "detergent", img: "laundry-5.jpg", alt: "Pouring a capful of detergent into the washer's dispenser drawer" },
