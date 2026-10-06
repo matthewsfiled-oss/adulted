@@ -13,7 +13,7 @@
     studentSilverYearly: 29.99, familyGoldYearly: 179.99,
     askPerDay: { free: 3, silver: 30, gold: 200 },
     supportEmail: "matthewsfiled@gmail.com",
-    siteUrl: "",
+    siteUrl: "https://adulted.onrender.com",
   };
 
   /* What each plan includes. live:false means it's on the roadmap, shown as "Coming soon". */
