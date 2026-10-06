@@ -2,7 +2,7 @@
 
 The life skills school never taught. Step-by-step guides with a picture for every step, a panic button for emergencies, a first apartment checklist, and Ask Anything, an AI helper that answers real-life questions with clear steps.
 
-This first build covers the **Home** module (laundry, care labels, dryer safety, clogged toilet, tripped breaker, smoke alarm, garbage disposal, water leaks, weekly cleaning), emergency guides (gas smell, power outage, lockout), the Free, Silver, and Gold plans screen, and a basic profile. Money, Living on your own, Food, Health, and Car show as "Coming soon."
+All six modules are live: **Home**, **Money**, **Living on your own**, **Food**, **Health and admin**, and **Car**, with 44 picture guides in total. Also included: Murphy's Law (the Ready tab, emergency kits, crisis and step-in guides), Snap and Solve (photo help for your exact machine or dashboard light), Craving to Cart (AI recipes plus a shopping list), a budget calculator, Where you stand (age comparisons), and the Free, Silver, and Gold plans screen.
 
 It's built exactly like Pathwise, so the same setup steps apply.
 
@@ -77,7 +77,7 @@ Open http://localhost:3001 for the landing page and http://localhost:3001/app fo
 
 | Folder | What it is |
 |---|---|
-| `web/app.html` | Every screen: Home, Learn, guides, Ask Anything, Help, Me, Plans |
+| `web/app.html` | Every screen: Home, Learn, modules, guides, Ask Anything, Snap and Solve, Craving to Cart, shopping list, budget calculator, Ready, Me, Plans |
 | `web/illustrations.js` | The step pictures (amber always marks where to look) |
 | `shared/data.js` | Guides, emergency numbers, checklist, plans and prices |
 | `shared/prompts.js` | What Ask Anything asks Claude, and how answers are checked |

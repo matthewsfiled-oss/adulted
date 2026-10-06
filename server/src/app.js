@@ -24,8 +24,8 @@ const safeEqual = (a, b) => {
 };
 
 // How often one person can use each AI feature (per 10 minutes), and how long the answer can be.
-const AI_LIMITS = { ask: 20, snap: 10 };
-const MAX_TOKENS = { ask: 1200, snap: 1500 };
+const AI_LIMITS = { ask: 20, snap: 10, recipe: 10 };
+const MAX_TOKENS = { ask: 1200, snap: 1500, recipe: 1800 };
 const SYSTEM = "You are Adulted's life-skills helper for young adults living on their own for the first time in the U.S. Give accurate, safe, practical help in plain language. Put safety first: for emergencies tell people to call 911, and for thoughts of suicide or self-harm share the 988 Suicide and Crisis Lifeline (call or text 988). Follow the requested format exactly.";
 
 /**

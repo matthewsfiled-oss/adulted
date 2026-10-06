@@ -20,7 +20,7 @@
   /* What each plan includes. live:false means it's on the roadmap, shown as "Coming soon". */
   const TIERS = [
     { id: "free", n: "Free", price: "$0", note: "Everything you need to get through the day",
-      has: [["Every step-by-step guide with pictures", true], ["Panic button and emergency help", true], ["First Apartment checklist", true], ["3 Ask Anything questions a day", true], ["2 Snap and Solve photos a day (beta)", true], ["Benefits Finder and Resource Directory", false], ["Meal Library and shopping lists", false]] },
+      has: [["Every step-by-step guide with pictures", true], ["Panic button and emergency help", true], ["First Apartment checklist", true], ["3 Ask Anything questions a day", true], ["2 Snap and Solve photos a day (beta)", true], ["Benefits Finder and Resource Directory", false], ["Meal Library and shopping lists", true]] },
     { id: "silver", n: "Silver", price: "$6.99/mo", alt: "or $49.99/yr", note: "For running your life without the guesswork",
       has: [["Everything in Free", true], ["30 Ask Anything questions a day", true], ["Snap and Solve: 20 photos a day", true], ["Document vault with renewal reminders", false], ["Full State Move Planner", false], ["Bill Check and homeownership tools", false]] },
     { id: "gold", n: "Gold", price: "$14.99/mo", alt: "or $119.99/yr", note: "The app handles the hard parts for you",
@@ -32,11 +32,11 @@
   /* The six modules. Only Home is live in this first build. */
   const MODULES = [
     { id: "home", n: "Home", blurb: "Laundry, cleaning, and fixing things before they get expensive", live: true },
-    { id: "money", n: "Money", blurb: "Budgets, paychecks, credit, and avoiding fees", live: false, soon: ["Read your first paycheck", "Build a starter budget", "How credit scores work", "Stop overdraft fees"] },
-    { id: "living", n: "Living on your own", blurb: "Leases, deposits, utilities, and roommates", live: false, soon: ["What to check before signing a lease", "Get your security deposit back", "Set up utilities and internet", "Roommate agreements"] },
-    { id: "food", n: "Food", blurb: "Grocery shopping, cooking basics, and food safety", live: false, soon: ["Meal Library with video steps", "Craving to Cart shopping lists", "How long leftovers last", "Cook 5 meals with one pan"] },
-    { id: "health", n: "Health and admin", blurb: "Doctors, insurance, prescriptions, and paperwork", live: false, soon: ["Make a doctor's appointment", "Health insurance words explained", "Where to keep important documents", "Urgent care or the ER?"] },
-    { id: "car", n: "Car", blurb: "Oil, tires, jump starts, and what to do after a crash", live: false, soon: ["Check your oil", "Check tire pressure", "Jump-start a car", "What to do after a fender bender"] },
+    { id: "money", n: "Money", blurb: "Paychecks, budgets, credit, and avoiding fees", live: true },
+    { id: "living", n: "Living on your own", blurb: "Leases, deposits, utilities, and roommates", live: true },
+    { id: "food", n: "Food", blurb: "Grocery shopping, cooking, recipes, and food safety", live: true },
+    { id: "health", n: "Health and admin", blurb: "Doctors, insurance, and important paperwork", live: true },
+    { id: "car", n: "Car", blurb: "Oil, tires, jump starts, and what to do after a crash", live: true },
   ];
 
   /* Guides. Each step: t = title, d = one short line, more = optional detail, v = illustration key.
@@ -204,6 +204,310 @@
         { t: "Make a plan for next time", d: "Give a spare key to someone you trust nearby.", v: "check" },
       ],
       related: [],
+    },
+
+    /* ---------- Money ---------- */
+    paycheck: {
+      n: "Read your paycheck", mod: "money", cat: "Paychecks", time: "5 minutes", level: 1,
+      tools: ["Your pay stub (paper or in your work app)"],
+      steps: [
+        { t: "Find your gross pay", d: "Gross pay is everything you earned before anything comes out: your hours times your pay rate.", v: "stubGross" },
+        { t: "Find the income taxes", d: "Federal and state income tax come out based on the W-4 form you filled out when you were hired.", more: "A few states, like New Hampshire and Florida, have no state income tax on wages.", v: "stubTax" },
+        { t: "Social Security and Medicare", d: "Almost every paycheck has 6.2% taken for Social Security and 1.45% for Medicare.", more: "On a stub they might say FICA, OASDI, SS, or MED.", v: "stubTax" },
+        { t: "Other deductions", d: "Health insurance, retirement savings like a 401(k), and other benefits you signed up for.", v: "stubTax" },
+        { t: "Net pay is what you get", d: "Net pay, or take-home pay, is what lands in your bank account. Budget with this number.", v: "stubNet" },
+        { t: "Check it every time", d: "Make sure your hours and pay rate are right. Mistakes happen.", more: "Found one? Tell your manager or payroll right away. Keep your stubs for at least a year.", v: "check" },
+      ],
+      pro: "Take-home pay way off from what you expected? Ask payroll to check your W-4, or you could owe money at tax time.",
+      related: ["budget"],
+    },
+    budget: {
+      n: "Build a starter budget", mod: "money", cat: "Budgeting", time: "20 minutes", level: 1,
+      tools: ["Your last few pay stubs", "Your bills"],
+      steps: [
+        { t: "Add up your monthly take-home", d: "Paid weekly? Multiply one paycheck by 52, then divide by 12.", more: "Every two weeks? Multiply by 26, then divide by 12.", v: "stubNet" },
+        { t: "List your must-pays", d: "Rent, utilities, phone, insurance, car payment, minimum debt payments, and groceries.", v: "listDoc" },
+        { t: "Try the 50/30/20 split", d: "About 50% on needs, 30% on wants, and 20% on savings and paying down debt.", more: "It's a starting point. If rent is high, cut wants first. The budget calculator in Money does the math for you.", v: "pie" },
+        { t: "Pay yourself first", d: "Set an automatic transfer to savings on payday, before you can spend it.", v: "transfer" },
+        { t: "Build an emergency fund", d: "Start with $500 to $1,000, then work up to 3 months of must-pays.", v: "jar" },
+        { t: "Check in every month", d: "Compare what you planned with what you spent, then adjust.", v: "calendar" },
+      ],
+      related: ["paycheck", "overdraft"],
+    },
+    credit: {
+      n: "How credit scores work", mod: "money", cat: "Credit", time: "5 minutes", level: 1,
+      tools: [],
+      steps: [
+        { t: "What a credit score is", d: "A number from 300 to 850 that shows lenders how likely you are to pay back money. Higher is better.", v: "creditGauge" },
+        { t: "Pay on time, every time", d: "Payment history is the biggest part of your score. One late payment can hurt for years.", more: "Set up autopay for at least the minimum on every card and loan.", v: "calendar" },
+        { t: "Keep balances low", d: "Try to use less than 30% of your credit limit. Lower is even better.", more: "With a $1,000 limit, keep the balance under $300.", v: "card" },
+        { t: "Keep old accounts open", d: "A longer history helps. Don't close your oldest card just because you stopped using it.", v: "card" },
+        { t: "Check your reports for free", d: "Get free reports from all three credit bureaus at AnnualCreditReport.com.", more: "Dispute anything that's wrong. Never pay a company that promises to fix your credit.", v: "report" },
+        { t: "Starting from zero?", d: "A secured credit card or being an authorized user on a family member's card can help you start.", v: "card" },
+      ],
+      related: ["budget"],
+    },
+    overdraft: {
+      n: "Stop overdraft and bank fees", mod: "money", cat: "Banking", time: "10 minutes", level: 1,
+      tools: ["Your bank app"],
+      steps: [
+        { t: "Know your real balance", d: "Check before you spend. Pending charges may not show yet.", v: "phoneBank" },
+        { t: "Turn on low-balance alerts", d: "Set your bank app to text you when your balance drops below an amount you pick.", v: "phoneBank" },
+        { t: "Say no to overdraft coverage", d: "Banks need your OK to charge overdraft fees on debit card buys. Without it, the card is just declined.", more: "Call your bank or check your app's settings to opt out.", v: "card" },
+        { t: "Link your savings", d: "Overdraft protection from your own savings often costs less, or nothing.", v: "transfer" },
+        { t: "Look for no-fee accounts", d: "Many banks and credit unions offer checking with no monthly fee and no overdraft fees.", v: "bank" },
+        { t: "Got charged? Ask", d: "Call and politely ask them to waive the fee, especially if it's your first. It often works.", v: "phone" },
+      ],
+      related: ["budget"],
+    },
+
+    /* ---------- Living on your own ---------- */
+    lease: {
+      n: "Before you sign a lease", mod: "living", cat: "Renting", time: "30 minutes", level: 2,
+      tools: ["The lease", "Your phone camera"],
+      steps: [
+        { t: "Read every page", d: "Find the rent, due date, late fee, lease length, and how much notice you must give to move out.", v: "leaseDoc" },
+        { t: "Ask what's included", d: "Which utilities, parking, laundry, and trash pickup will you pay for?", v: "utilities" },
+        { t: "Check the place over", d: "Run faucets, flush toilets, test outlets and locks, and look for leaks, mold, or pests.", v: "faucet" },
+        { t: "Know the move-in costs", d: "First month's rent, security deposit, and any fees. Get every amount in writing.", more: "Rules vary by state. In Massachusetts, a landlord can charge at most first and last month's rent, a security deposit up to one month's rent, and the cost of a new lock.", v: "cash" },
+        { t: "Get promises in writing", d: "If the landlord promises new paint or a fixed oven, add it to the lease before you sign.", v: "pen" },
+        { t: "Keep a copy", d: "Save a signed copy and a photo of every page on your phone.", v: "camera" },
+      ],
+      pro: "Lease seem unfair or confusing? Local legal aid or a tenant rights group can look it over for free or cheap.",
+      related: ["deposit", "utilities"],
+    },
+    deposit: {
+      n: "Get your security deposit back", mod: "living", cat: "Renting", time: "Move-in and move-out", level: 1,
+      tools: ["Your phone camera"],
+      steps: [
+        { t: "Photograph everything on move-in", d: "Photos and video of every room, wall, floor, and appliance before you unpack.", v: "camera" },
+        { t: "Send a damage list", d: "Email your landlord a list of anything already damaged, with photos, in the first week.", more: "Some states, including Massachusetts, require the landlord to give you a written condition statement. Check it, sign it, and keep a copy.", v: "email" },
+        { t: "Report problems in writing", d: "Tell your landlord about leaks or broken things right away, so they aren't blamed on you.", v: "email" },
+        { t: "Clean before you leave", d: "Clean every room, take out all trash, and patch small nail holes if your lease allows it.", v: "floor" },
+        { t: "Do a final walkthrough", d: "Walk through with your landlord if you can, and take new photos of every room.", v: "camera" },
+        { t: "Give your new address", d: "Send it in writing so the deposit can reach you. States set a deadline to return it.", more: "In Massachusetts it's 30 days after you move out.", v: "email" },
+      ],
+      related: ["lease"],
+    },
+    utilities: {
+      n: "Set up utilities and internet", mod: "living", cat: "Moving in", time: "1 hour", level: 1,
+      tools: ["Your lease", "Your ID"],
+      steps: [
+        { t: "Ask what's in your name", d: "Ask the landlord which you set up: electric, gas, water, trash, and internet.", v: "utilities" },
+        { t: "Call 1 to 2 weeks ahead", d: "Schedule service to start on move-in day so you aren't in the dark.", v: "calendar" },
+        { t: "Have your info ready", d: "Your new address, move-in date, and ID. Some ask for a deposit if you have no credit history.", v: "idCard" },
+        { t: "Compare internet plans", d: "See which companies serve your address. Ask what the price is after the first year.", v: "wifi" },
+        { t: "Photo the meters on day one", d: "Take a photo of the electric and gas meter readings so you only pay for what you use.", v: "meter" },
+        { t: "Set up autopay", d: "Autopay or reminders keep anything from getting shut off by accident.", v: "calendar" },
+      ],
+      related: ["lease", "roommate"],
+    },
+    roommate: {
+      n: "Make a roommate agreement", mod: "living", cat: "Roommates", time: "30 minutes", level: 1,
+      tools: [],
+      steps: [
+        { t: "Talk early", d: "Sit down in the first week, before small things turn into fights.", v: "talk" },
+        { t: "Split the bills", d: "Decide who pays what and when. A bill-splitting app keeps it tracked.", v: "pie" },
+        { t: "Make a chore chart", d: "Dishes, trash, bathroom, and shared spaces. Rotate them weekly.", v: "listDoc" },
+        { t: "Agree on guests and quiet hours", d: "How often can friends or partners stay over? When does it get quiet?", v: "timer" },
+        { t: "Decide what's shared", d: "Food, cleaning supplies, and dishes: what's shared and what's yours?", v: "fridge" },
+        { t: "Write it down", d: "Put it in a shared note, both agree to it, and check in after a month.", v: "pen" },
+      ],
+      related: ["utilities"],
+    },
+
+    /* ---------- Food ---------- */
+    groceries: {
+      n: "Grocery shopping on a budget", mod: "food", cat: "Shopping", time: "About 1 hour a week", level: 1,
+      tools: ["Your shopping list"],
+      steps: [
+        { t: "Plan your meals first", d: "Pick the week's meals, then shop for just those.", v: "listDoc" },
+        { t: "Check what you have", d: "Look in the fridge and cupboards so you don't buy doubles.", v: "fridge" },
+        { t: "Make a list and stick to it", d: "Shopping without a list leads to extra buys you didn't need.", v: "listDoc" },
+        { t: "Compare unit prices", d: "The small shelf tag shows the price per ounce or pound. That's the real deal.", v: "unitPrice" },
+        { t: "Try store brands", d: "Store brands often cost much less for nearly the same thing.", v: "cart" },
+        { t: "Don't shop hungry", d: "Eat first. Hungry shoppers spend more.", v: "check" },
+      ],
+      related: ["leftovers", "sheetpan"],
+    },
+    meatsafety: {
+      n: "Cook meat safely", mod: "food", cat: "Food safety", time: "2 minutes", level: 2,
+      tools: ["Food thermometer"],
+      steps: [
+        { t: "Wash your hands", d: "20 seconds with soap before and after touching raw meat.", v: "faucet" },
+        { t: "Keep raw meat separate", d: "Use a different cutting board and plate for raw meat.", v: "boards" },
+        { t: "Use a thermometer", d: "Color isn't a safe test. Push it into the thickest part of the meat.", v: "therm165" },
+        { t: "Chicken and turkey: 165°F", d: "All poultry, including ground turkey, is done at 165°F.", v: "therm165" },
+        { t: "Ground beef and pork: 160°F", d: "Burgers and other ground meat are done at 160°F.", v: "therm160" },
+        { t: "Steaks and chops: 145°F", d: "Whole cuts of beef and pork are safe at 145°F, then let them rest 3 minutes.", v: "therm145" },
+      ],
+      related: ["leftovers", "sheetpan"],
+    },
+    leftovers: {
+      n: "How long leftovers last", mod: "food", cat: "Food safety", time: "1 minute", level: 1,
+      tools: [],
+      steps: [
+        { t: "Refrigerate within 2 hours", d: "Within 1 hour if it's over 90°F. Keep your fridge at 40°F or colder.", v: "fridge" },
+        { t: "Use shallow containers", d: "Food cools faster in shallow containers, before bacteria can grow.", v: "container" },
+        { t: "Eat within 3 to 4 days", d: "Most leftovers are safe in the fridge for 3 to 4 days. Write the date on them.", v: "container" },
+        { t: "Freeze for later", d: "Frozen food stays safe, and tastes best if eaten within 3 to 4 months.", v: "freezer" },
+        { t: "Reheat to 165°F", d: "Heat leftovers until they're steaming hot all the way through.", v: "therm165" },
+        { t: "When in doubt, throw it out", d: "You can't always see or smell the bacteria that make you sick.", v: "trash" },
+      ],
+      related: ["meatsafety"],
+    },
+    sheetpan: {
+      n: "Sheet-pan chicken and vegetables", mod: "food", cat: "One-pan meals", time: "40 minutes", level: 1,
+      tools: ["Sheet pan", "Food thermometer"],
+      recipe: { serves: 2, cost: "About $8 to $10", items: [["Chicken thighs", "1 lb"], ["Potatoes", "2 medium"], ["Broccoli", "1 bag (12 oz)"], ["Olive oil", "2 tbsp"], ["Garlic powder", "1 tsp"], ["Salt and pepper", "To taste"]] },
+      steps: [
+        { t: "Heat the oven to 425°F", d: "Let it heat while you chop.", v: "oven" },
+        { t: "Chop the vegetables", d: "Cut potatoes into bite-size pieces and broccoli into small trees.", v: "knife" },
+        { t: "Season everything", d: "Toss the chicken and vegetables with oil, garlic powder, salt, and pepper.", v: "bowl" },
+        { t: "Spread it out", d: "One layer on the pan, not piled up, so it browns instead of steams.", v: "sheetPan" },
+        { t: "Roast 25 to 30 minutes", d: "Until the potatoes are browned and the chicken reads 165°F.", v: "therm165" },
+        { t: "Save the extras", d: "Put leftovers in shallow containers in the fridge. Eat within 3 to 4 days.", v: "container" },
+      ],
+      related: ["meatsafety", "leftovers"],
+    },
+    pasta: {
+      n: "One-pot pasta", mod: "food", cat: "One-pan meals", time: "25 minutes", level: 1,
+      tools: ["A big pot"],
+      recipe: { serves: 3, cost: "About $5 to $7", items: [["Spaghetti", "8 oz"], ["Diced tomatoes", "1 can (14.5 oz)"], ["Onion", "1"], ["Garlic", "2 cloves"], ["Olive oil", "2 tbsp"], ["Water", "3 cups"], ["Parmesan cheese", "For topping"], ["Salt and pepper", "To taste"]] },
+      steps: [
+        { t: "Put it all in the pot", d: "Pasta, tomatoes, sliced onion and garlic, oil, salt, and the water.", v: "pot" },
+        { t: "Bring it to a boil", d: "On high heat. Stay close so it doesn't boil over.", v: "pot" },
+        { t: "Stir often", d: "Boil 9 to 11 minutes, stirring every minute or two so nothing sticks.", v: "pot" },
+        { t: "Check the pasta", d: "Taste a piece. It's done when it's soft with a little bite and most of the water is gone.", v: "pot" },
+        { t: "Top it and serve", d: "Add cheese and pepper.", v: "bowl" },
+      ],
+      related: ["groceries"],
+    },
+    eggs: {
+      n: "Scrambled eggs", mod: "food", cat: "One-pan meals", time: "10 minutes", level: 1,
+      tools: ["Nonstick pan", "Spatula"],
+      recipe: { serves: 1, cost: "About $1 to $2", items: [["Eggs", "3"], ["Butter", "1 tbsp"], ["Salt and pepper", "A pinch"]] },
+      steps: [
+        { t: "Crack and whisk", d: "Crack the eggs into a bowl, add a pinch of salt, and whisk until no streaks are left.", v: "bowl" },
+        { t: "Melt the butter", d: "Medium-low heat. Low and slow keeps eggs soft.", v: "pan" },
+        { t: "Pour in the eggs", d: "Let them sit a few seconds until the edges start to set.", v: "pan" },
+        { t: "Push and fold", d: "Slowly push the eggs across the pan with a spatula to make soft curds.", v: "pan" },
+        { t: "Take them off a little early", d: "Pull the pan off when they still look a bit wet. They keep cooking.", v: "check" },
+      ],
+      related: ["groceries"],
+    },
+
+    /* ---------- Health and admin ---------- */
+    doctor: {
+      n: "Find a doctor and book a visit", mod: "health", cat: "Doctors", time: "20 minutes", level: 1,
+      tools: ["Your insurance card", "Your ID"],
+      steps: [
+        { t: "Check your insurance first", d: "Use your insurance app or call the number on your card to find doctors in your network.", v: "insCard" },
+        { t: "Pick a primary care doctor", d: "A primary care provider handles checkups and sends you to specialists when needed.", v: "doctor" },
+        { t: "Call or book online", d: "Say you're a new patient and ask for the first open appointment.", more: "New-patient waits can be weeks, so book before you get sick.", v: "phone" },
+        { t: "Have your info ready", d: "Insurance card, ID, your medicines, allergies, and past health issues.", v: "idCard" },
+        { t: "Write your questions down", d: "Bring a short list so you don't forget anything in the exam room.", v: "listDoc" },
+        { t: "Get there early", d: "Arrive 15 minutes early for new-patient paperwork.", v: "timer" },
+      ],
+      related: ["insurance", "urgentcare"],
+    },
+    insurance: {
+      n: "Health insurance words, explained", mod: "health", cat: "Insurance", time: "5 minutes", level: 1,
+      tools: [],
+      steps: [
+        { t: "Premium", d: "What you pay every month to have insurance, even if you never use it.", more: "You can usually stay on a parent's plan until you turn 26.", v: "insCard" },
+        { t: "Deductible", d: "What you pay for care each year before insurance starts paying its share.", v: "cash" },
+        { t: "Copay", d: "A set amount, like $25, for a visit or a prescription.", v: "cash" },
+        { t: "Coinsurance", d: "After the deductible, you pay a percentage, like 20%, and insurance pays the rest.", v: "pie" },
+        { t: "Out-of-pocket max", d: "The most you'll pay for covered care in a year. After that, insurance pays 100%.", v: "check" },
+        { t: "In-network", d: "Doctors who work with your plan. Going out of network usually costs a lot more.", v: "doctor" },
+      ],
+      related: ["doctor", "urgentcare"],
+    },
+    urgentcare: {
+      n: "Urgent care or the ER?", mod: "health", cat: "Getting care", time: "1 minute", level: 2,
+      tools: [],
+      safety: "Chest pain, trouble breathing, stroke signs, or bad bleeding: call 911.",
+      steps: [
+        { t: "ER for emergencies", d: "Chest pain, trouble breathing, stroke signs, bad bleeding, or a serious injury.", v: "hospital" },
+        { t: "Urgent care for the in-between", d: "Sprains, cuts that may need stitches, flu, ear infections, and rashes.", v: "clinic" },
+        { t: "Your doctor for the rest", d: "Checkups, refills, and problems that can wait a day or two.", v: "doctor" },
+        { t: "Call the nurse line", d: "Many insurance cards list a free 24/7 nurse line that can tell you where to go.", v: "insCard" },
+        { t: "Know the cost difference", d: "The ER usually costs far more than urgent care for the same small problem.", v: "cash" },
+        { t: "When in doubt, get help", d: "If it might be serious, don't let cost stop you. Call 911.", v: "phone" },
+      ],
+      related: ["doctor", "hurtalone"],
+    },
+    documents: {
+      n: "Keep important documents safe", mod: "health", cat: "Paperwork", time: "30 minutes", level: 1,
+      tools: ["A folder or fireproof box"],
+      steps: [
+        { t: "Gather the originals", d: "Birth certificate, Social Security card, passport, car title, and insurance policies.", v: "folder" },
+        { t: "Store them safely", d: "Keep originals in a fireproof box or folder at home, not in your wallet.", v: "safeBox" },
+        { t: "Carry only what you need", d: "Your ID and insurance card. Leave your Social Security card at home.", v: "idCard" },
+        { t: "Make digital copies", d: "Scan or photograph them and save them somewhere password-protected.", v: "camera" },
+        { t: "Track expiration dates", d: "Write down when your license, registration, and passport expire, and set reminders.", v: "calendar" },
+        { t: "Shred old papers", d: "Shred anything with your Social Security or account numbers before throwing it out.", v: "shred" },
+      ],
+      related: ["doctor"],
+    },
+
+    /* ---------- Car ---------- */
+    oil: {
+      n: "Check your oil", mod: "car", cat: "Maintenance", time: "5 minutes", level: 1,
+      tools: ["Paper towel or rag"],
+      steps: [
+        { t: "Park on level ground", d: "Turn the engine off and wait 5 to 10 minutes so the oil settles.", more: "Some newer cars have no dipstick and show the oil level on the dashboard. Check your owner's manual.", v: "car" },
+        { t: "Open the hood", d: "Pull the hood release inside the car, then find the latch under the front of the hood.", v: "hood" },
+        { t: "Find the dipstick", d: "Look for a loop handle, often yellow or orange, sometimes with an oil can symbol.", v: "dipstick" },
+        { t: "Pull, wipe, push back in", d: "Pull it out, wipe it clean, then push it all the way back in.", v: "dipstick" },
+        { t: "Pull it again and read it", d: "The oil line should be between the two marks. Below the low mark? Add oil.", v: "dipRead" },
+        { t: "Add the right oil", d: "Use the type in your owner's manual, like 5W-30. Add a little at a time, then check again.", v: "oilCan" },
+      ],
+      pro: "Oil looks milky, or you have to add it often? Have a mechanic check it soon.",
+      related: ["tires"],
+    },
+    tires: {
+      n: "Check tire pressure", mod: "car", cat: "Maintenance", time: "10 minutes", level: 1,
+      tools: ["Tire pressure gauge"],
+      steps: [
+        { t: "Find the right number", d: "Check the sticker inside the driver's door. Don't use the number printed on the tire.", v: "doorSticker" },
+        { t: "Check when tires are cold", d: "Before driving, or after the car has sat for a few hours.", v: "timer" },
+        { t: "Take off the valve cap", d: "Twist off the small cap on the tire's valve stem.", v: "tireValve" },
+        { t: "Press the gauge on", d: "Push it straight on until the hissing stops, then read the number.", v: "tireGauge" },
+        { t: "Add air if it's low", d: "Most gas stations have an air pump. Add a little, then check again.", v: "tireGauge" },
+        { t: "Check every month", d: "Cold weather lowers tire pressure, so check more often in winter.", v: "calendar" },
+      ],
+      related: ["oil"],
+    },
+    jump: {
+      n: "Jump-start a car", mod: "car", cat: "Breakdowns", time: "15 minutes", level: 2,
+      tools: ["Jumper cables", "A second car that runs"],
+      safety: "Never let the metal clamps touch each other while any clamp is on a battery.",
+      steps: [
+        { t: "Park nose to nose", d: "Get the working car close. Both cars off, parking brakes on.", v: "twoCars" },
+        { t: "Red to the dead battery +", d: "Clamp one red clip to the + terminal on the dead battery.", v: "jumpDeadPos" },
+        { t: "Red to the good battery +", d: "Clamp the other red clip to the + terminal on the good battery.", v: "jumpGoodPos" },
+        { t: "Black to the good battery −", d: "Clamp one black clip to the − terminal on the good battery.", v: "jumpGoodNeg" },
+        { t: "Black to bare metal", d: "Clamp the last black clip to unpainted metal on the dead car's engine, away from the battery.", v: "jumpGround" },
+        { t: "Start, then remove", d: "Start the good car, wait a few minutes, then start the dead one. Remove clips in reverse order.", more: "Drive the jumped car for at least 20 minutes so the battery can recharge.", v: "check" },
+      ],
+      pro: "Won't start after a jump, or dies again soon? The battery or alternator may need replacing.",
+      related: ["crash"],
+    },
+    fenderbender: {
+      n: "After a fender bender", mod: "car", cat: "Accidents", time: "30 minutes", level: 2,
+      tools: ["Your phone", "Your license, registration, and insurance card"],
+      safety: "If anyone is hurt or the cars are blocking traffic in a dangerous spot, call 911 first.",
+      steps: [
+        { t: "Check for injuries", d: "Is anyone hurt? Call 911.", v: "phone" },
+        { t: "Move out of traffic", d: "If the cars can drive and no one is hurt, pull to the side and turn on hazard lights.", v: "car" },
+        { t: "Swap information", d: "Names, phone numbers, insurance companies and policy numbers, plates, and car make and model.", v: "idCard" },
+        { t: "Take photos", d: "Both cars, the damage, both plates, the scene, and the other driver's insurance card.", v: "camera" },
+        { t: "Don't argue about fault", d: "Stay calm and stick to the facts. Let the insurance companies decide.", v: "talk" },
+        { t: "Report it", d: "Call your insurance company. File a police report if anyone was hurt or your state requires it.", more: "In Massachusetts, file a crash report within 5 days if anyone was hurt or damage is over $1,000.", v: "phone" },
+      ],
+      related: ["crash"],
     },
 
     /* ---------- Murphy's Law: when it goes wrong and you're on your own ---------- */
@@ -442,6 +746,11 @@
     "A 2-hour CPR class could let you save someone's life.",
     "Never throw water on a grease fire. Cover it with a lid.",
     "Add an emergency contact to your phone's lock screen today.",
+    "Check the unit price on the shelf tag. That's the real deal.",
+    "Pay on time every time. It's the biggest part of your credit score.",
+    "Check your tire pressure once a month, and more in winter.",
+    "Leftovers are good for 3 to 4 days in the fridge.",
+    "Book a doctor's checkup before you get sick. New-patient waits can be long.",
   ];
   const dayIndex = (ymd, n) => { const [y, m, d] = String(ymd).split("-").map(Number); return Math.floor(Date.UTC(y, m - 1, d) / 864e5) % n; };
 

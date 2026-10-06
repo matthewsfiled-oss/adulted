@@ -21,8 +21,8 @@ test('every guide is complete and every step has a picture', () => {
 
 test('panic list, modules, and checklists point at real content', () => {
   for (const id of D.PANIC) assert.ok(D.GUIDES[id], id);
-  assert.ok(D.MODULES.some((m) => m.live));
-  for (const m of D.MODULES) if (!m.live) assert.ok(m.soon.length);
+  for (const m of D.MODULES) assert.ok(Object.values(D.GUIDES).filter((g) => g.mod === m.id && !g.urgent).length >= 4, `${m.id} needs at least 4 guides`);
+  for (const g of Object.values(D.GUIDES)) if (g.recipe) assert.ok(g.recipe.items.length >= 3 && g.recipe.serves >= 1, g.n);
   for (const c of Object.values(D.CHECKLISTS)) for (const [, items] of c.groups) assert.ok(items.length);
 });
 

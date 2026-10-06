@@ -80,7 +80,8 @@ Rules: plain words a 16-year-old understands, short sentences, no jargon. U.S. c
   const SNAP_TARGETS = {
     laundry: "washing machine controls", dryer: "dryer controls", labels: "clothing care label",
     disposal: "garbage disposal under the sink", breaker: "breaker panel", smoke: "smoke or carbon monoxide alarm",
-    shutoff: "water shutoff valve", toilet: "toilet", outage: "breaker panel", other: "appliance or thing you need help with",
+    shutoff: "water shutoff valve", toilet: "toilet", outage: "breaker panel", dashboard: "car dashboard warning light",
+    other: "appliance or thing you need help with",
   };
   const IMAGE_RE = /^data:(image\/(?:jpeg|png|webp));base64,([A-Za-z0-9+/=]+)$/;
   const MAX_IMAGE_CHARS = 4500000; // about 3.3 MB once decoded
@@ -128,6 +129,44 @@ Rules: plain words a 16-year-old understands. Only describe controls you can act
       return {
         what: str(j.what, 80), brand: str(j.brand, 40), model: str(j.model, 40), sure: j.sure === true,
         summary: str(j.summary, 400), steps, safety: str(j.safety, 280), retake: str(j.retake, 280), manual: str(j.manual, 120),
+      };
+    },
+  };
+
+  // Craving to Cart: any food someone loves, as a simple recipe and a shopping list.
+  const KITCHENS = { full: "a stove and an oven", stove: "a stove but no oven", micro: "only a microwave" };
+  TASKS.recipe = {
+    json: true, tier: "main",
+    input(p) {
+      const dish = str(p && p.dish, 80);
+      if (dish.length < 2) throw new BadInput();
+      const servings = [1, 2, 4, 6].includes(+p.servings) ? +p.servings : 2;
+      const kitchen = KITCHENS[p.kitchen] ? p.kitchen : "full";
+      return { dish, servings, kitchen };
+    },
+    prompt({ dish, servings, kitchen }) {
+      return `A young adult cooking for themselves is craving: "${dish}". They may not know what's in it.
+Write the simplest good home version for ${servings} serving${servings === 1 ? "" : "s"}, cooked with ${KITCHENS[kitchen]}, using ingredients from a normal U.S. grocery store.
+Reply with only one JSON object in this shape:
+{"title": the dish name,
+ "summary": one plain sentence describing it (if this isn't a food or dish, say so kindly here and leave items and steps empty),
+ "serves": ${servings},
+ "time": total time like "35 minutes",
+ "cost": rough grocery cost like "About $10 to $14",
+ "items": 3 to 14 ingredients, each {"n": ingredient as you'd find it in a store, "a": amount like "1 lb" or "2 cloves"},
+ "steps": 3 to 8 steps in order, each {"t": short title, "d": one plain sentence with times and temperatures},
+ "safety": one sentence on food safety if it has meat, eggs, or fish (safe internal temperatures: poultry 165°F, ground meat 160°F, whole cuts of beef and pork 145°F with a 3-minute rest, fish 145°F), otherwise ""}
+
+Rules: beginner-friendly, few tools, plain words a 16-year-old understands. No alcohol. Never suggest unsafe practices like leaving meat out to thaw.`;
+    },
+    clean(j) {
+      if (!j || typeof j !== "object") { const e = new Error("invalid_json"); e.code = "invalid_json"; throw e; }
+      return {
+        title: str(j.title, 80) || "Your recipe", summary: str(j.summary, 300),
+        serves: Math.max(1, Math.min(12, Math.round(+j.serves) || 2)), time: str(j.time, 30), cost: str(j.cost, 40),
+        items: (Array.isArray(j.items) ? j.items : []).slice(0, 14).filter((x) => x && x.n).map((x) => ({ n: str(x.n, 60), a: str(x.a, 30) })),
+        steps: (Array.isArray(j.steps) ? j.steps : []).slice(0, 8).filter((x) => x && x.t).map((x) => ({ t: str(x.t, 80), d: str(x.d, 280) })),
+        safety: str(j.safety, 280),
       };
     },
   };

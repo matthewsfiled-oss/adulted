@@ -86,6 +86,20 @@ test('snap refuses anything that is not a photo, and big bodies only work for ph
   });
 });
 
+test('recipe returns ingredients and steps for a shopping list', async () => {
+  const client = fakeClient([{ title: 'Chicken parm', summary: 'Crispy chicken with sauce and cheese.', serves: 2, time: '40 minutes', cost: 'About $12',
+    items: [{ n: 'Chicken breasts', a: '2' }, { a: 'no name, dropped' }], steps: [{ t: 'Bread the chicken', d: 'Dip in egg, then crumbs.' }], safety: 'Cook chicken to 165°F.' }]);
+  await withServer(createApp({ client, models }), async (base) => {
+    const { result } = await (await post(base, '/api/ai/recipe', { dish: 'chicken parm', servings: 99, kitchen: 'micro' })).json();
+    assert.deepEqual(result.items, [{ n: 'Chicken breasts', a: '2' }]);
+    assert.equal(result.steps.length, 1);
+    const prompt = client.calls[0].messages[0].content;
+    assert.match(prompt, /chicken parm/);
+    assert.match(prompt, /2 servings/);
+    assert.match(prompt, /only a microwave/);
+  });
+});
+
 test('bad input is refused before calling Claude, and only Adulted tasks exist', async () => {
   const client = fakeClient([]);
   await withServer(createApp({ client, models }), async (base) => {

@@ -85,6 +85,16 @@ p{margin:0}
 .snap-marked{position:relative;border-radius:12px;overflow:hidden;border:2.5px solid var(--ink)}
 .snap-marked img{display:block;width:100%}
 .snap-marked .mark{position:absolute;transform:translate(-50%,-50%);width:34px;height:34px;border-radius:50%;background:var(--amber);border:3px solid var(--ink);display:grid;place-items:center;font-family:var(--display);font-weight:800;font-size:16px;box-shadow:0 0 0 3px #fff}
+.tool{display:grid;grid-template-columns:auto minmax(0,1fr);gap:12px;align-items:center;background:var(--card);border:2px solid var(--ink);border-radius:14px;padding:12px 14px;text-decoration:none;color:var(--ink)}
+.tool .ic{width:46px;height:46px;border-radius:12px;background:var(--amber);border:2px solid var(--ink);display:grid;place-items:center}
+.tool b{display:block}
+.ingr{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.ingr li{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-top:1.5px solid var(--line)}
+.ingr li:first-child{border-top:0}
+.addrow{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px}
+.split{display:flex;height:22px;border:2px solid var(--ink);border-radius:8px;overflow:hidden}
+.split span+span{border-left:2px solid var(--ink)}
+.big-num{font-family:var(--display);font-stretch:112%;font-weight:900;font-size:26px}
 .tip{background:var(--amber-soft);border-left:6px solid var(--amber);border-radius:4px 12px 12px 4px;padding:14px 16px;display:flex;gap:12px;align-items:flex-start}
 .tip b{display:block;font-size:14px;color:var(--amber-ink)}
 
@@ -153,9 +163,9 @@ textarea:focus,input[type=text]:focus,select:focus{outline:none;border-color:var
 label.f{display:flex;flex-direction:column;gap:6px;font-weight:700;font-size:15.5px}
 .answer{background:var(--card);border:2.5px solid var(--ink);border-radius:18px;padding:18px;display:flex;flex-direction:column;gap:12px}
 .answer ol{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:10px;counter-reset:a}
-.answer li{display:grid;grid-template-columns:34px minmax(0,1fr);gap:10px;counter-increment:a}
-.answer li::before{content:counter(a);width:34px;height:34px;border-radius:50%;background:var(--amber);border:2px solid var(--ink);display:grid;place-items:center;font-weight:700;font-family:var(--display)}
-.answer li b{display:block}
+.answer ol>li{display:grid;grid-template-columns:34px minmax(0,1fr);gap:10px;counter-increment:a}
+.answer ol>li::before{content:counter(a);width:34px;height:34px;border-radius:50%;background:var(--amber);border:2px solid var(--ink);display:grid;place-items:center;font-weight:700;font-family:var(--display)}
+.answer ol>li b{display:block}
 .answer .foot{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;font-size:14.5px;color:var(--muted);border-top:1.5px solid var(--line);padding-top:10px}
 .meter{font-size:15px;color:var(--muted)}
 .err{color:var(--red);font-weight:700}
@@ -284,7 +294,14 @@ const WORDS = {
   laundry: "washer washing machine wash clothes detergent pods load", labels: "tag symbols care label dry clean bleach iron",
   dryer: "lint dry clothes damp", toilet: "clog clogged plunger overflow poop bathroom", breaker: "outlet no power room electricity tripped circuit",
   smoke: "beeping chirp chirping alarm detector battery", disposal: "sink garbage jammed humming kitchen", shutoff: "leak leaking flood flooding pipe burst water everywhere",
-  cleaning: "clean chores mess dirty routine", outage: "blackout power out lights out storm", gas: "smell rotten eggs stove leak", lockout: "locked out keys lost key door",
+  cleaning: "clean chores mess dirty routine",
+  paycheck: "pay stub paystub taxes take home net gross w-4 fica", budget: "money spending save saving 50/30/20 plan", credit: "credit score card report fico",
+  overdraft: "bank fee fees overdrawn checking debit", lease: "apartment rent renting landlord sign", deposit: "security deposit move out moving",
+  utilities: "electric gas internet wifi water bill", roommate: "roommates sharing chores bills", groceries: "grocery store food shopping cheap budget",
+  meatsafety: "chicken beef pork temperature undercooked raw", leftovers: "fridge food spoil expire old", sheetpan: "dinner recipe chicken oven easy",
+  pasta: "spaghetti dinner recipe cheap easy", eggs: "breakfast recipe", doctor: "appointment doctor sick checkup primary care",
+  insurance: "health insurance deductible copay premium", urgentcare: "urgent care er emergency room sick hurt", documents: "papers birth certificate social security passport",
+  oil: "car engine oil change dipstick", tires: "tire pressure flat low psi", jump: "dead battery car won't start jumper cables", fenderbender: "car accident crash insurance", outage: "blackout power out lights out storm", gas: "smell rotten eggs stove leak", lockout: "locked out keys lost key door",
 };
 function searchGuides(q){
   const terms = q.toLowerCase().split(/\s+/).filter((t) => t.length > 1);
@@ -303,7 +320,8 @@ function guideRow(id){
     <span><span class="nm">${esc(g.n)}</span><br><span class="sub">${g.steps.length} steps, ${esc(g.time.toLowerCase())}</span></span>
     <span class="go">Show me how</span></a>`;
 }
-const homeGuides = () => Object.keys(GUIDES).filter((id) => GUIDES[id].mod === "home" && !GUIDES[id].urgent);
+const modGuides = (mod) => Object.keys(GUIDES).filter((id) => GUIDES[id].mod === mod && !GUIDES[id].urgent);
+const homeGuides = () => modGuides("home");
 function checklistPct(id){ const all = CHECKLISTS[id].groups.flatMap(([, items]) => items); const c = CHECKS[id] || {}; return [all.filter((_, i) => c[i]).length, all.length]; }
 
 /* ---------- Home ---------- */
@@ -361,7 +379,7 @@ function homeView(){
   });
 }
 function modsGrid(){
-  return `<div class="mods">${MODULES.map((m) => `<a class="mod${m.live ? " live" : ""}" href="#m-${m.id}"><span class="ic">${ico(MOD_ICON[m.id])}</span><h3>${esc(m.n)}</h3><span class="st">${m.live ? `${homeGuides().length} guides` : "Coming soon"}</span></a>`).join("")}</div>`;
+  return `<div class="mods">${MODULES.map((m) => `<a class="mod${m.live ? " live" : ""}" href="#m-${m.id}"><span class="ic">${ico(MOD_ICON[m.id])}</span><h3>${esc(m.n)}</h3><span class="st">${m.live ? `${modGuides(m.id).length} guides` : "Coming soon"}</span></a>`).join("")}</div>`;
 }
 
 /* ---------- Learn and modules ---------- */
@@ -381,11 +399,18 @@ function moduleView(id){
       <a class="btn blue full" href="#ask">${ico("chat")} Ask Anything in the meantime</a></section>`;
     return;
   }
-  const ids = homeGuides(), cats = [...new Set(ids.map((x) => GUIDES[x].cat))];
+  const ids = modGuides(id), cats = [...new Set(ids.map((x) => GUIDES[x].cat))];
+  const tools = {
+    money: `<a class="tool" href="#budget"><span class="ic">${ico("wallet", 26)}</span><span><b>Budget calculator</b><span class="small">Type your take-home pay and see a starter budget.</span></span></a>`,
+    food: `<a class="tool" href="#cook"><span class="ic">${ico("food", 26)}</span><span><b>Craving to Cart</b><span class="small">Name any food you love. Get a simple recipe and a shopping list.</span></span></a>
+      <a class="tool" href="#shop"><span class="ic">${ico("list", 26)}</span><span><b>Shopping list</b><span class="small">${shopList().filter((x) => !x.done).length} items to buy</span></span></a>`,
+    car: snapPromo("dashboard"),
+  }[id] || "";
   app.innerHTML = `<a class="back" href="#learn">${ico("back", 18)} Learn</a>
   <section class="hello"><h1>${esc(m.n)}</h1><p class="muted">${esc(m.blurb)}.</p></section>
+  ${tools ? `<section class="sec">${tools}</section>` : ""}
   ${cats.map((c) => `<section class="sec"><h2>${esc(c)}</h2><div class="list">${ids.filter((x) => GUIDES[x].cat === c).map(guideRow).join("")}</div></section>`).join("")}
-  <section class="sec"><h2>Emergencies</h2><div class="list">${PANIC.filter((x) => GUIDES[x].urgent).map(guideRow).join("")}</div></section>`;
+  ${id === "home" ? `<section class="sec"><h2>Emergencies</h2><div class="list">${PANIC.filter((x) => GUIDES[x].urgent).map(guideRow).join("")}</div></section>` : ""}`;
 }
 
 /* ---------- One guide: a deck of picture cards, one step each ---------- */
@@ -408,6 +433,7 @@ function guideView(id){
     ${g.tools.length ? `<p class="tools"><b style="color:var(--ink)">You'll need:</b> ${g.tools.map(esc).join(", ")}</p>` : ""}
     ${g.safety ? `<div class="warn${g.level === 3 ? " red" : ""}">${ico("sos", 20)}<span>${esc(g.safety)}</span></div>` : ""}
     ${SNAP[snapTargetFor(id)] && snapTargetFor(id) !== "other" ? snapPromo(snapTargetFor(id)) : ""}
+    ${g.recipe ? recipeCard(g.recipe.items, `Serves ${g.recipe.serves}. ${g.recipe.cost}.`) : ""}
   </section>
   <div class="deck" id="deck" tabindex="0" aria-label="Steps, swipe to go through them">${g.steps.map((st, i) => `
     <article class="step" aria-label="Step ${i + 1} of ${n}">
@@ -433,6 +459,7 @@ function guideView(id){
   const did = $("#didIt");
   if (did) did.onclick = () => { markDone(id); did.outerHTML = `<div class="done-msg">${ico("check")} Nice. That's ${DONE.length} skill${DONE.length === 1 ? "" : "s"} learned.</div>`; };
   $("#askMore").addEventListener("click", () => store.set("draft", `${g.n}: `));
+  if (g.recipe) wireRecipe(g.recipe.items);
 }
 
 /* ---------- Snap and Solve: a photo of your own machine, steps for that exact machine ---------- */
@@ -440,12 +467,15 @@ const SNAP = {
   laundry: ["washer", "How do I wash a normal load on this washer?"], dryer: ["dryer", "How do I dry a normal load on this dryer?"],
   labels: ["clothing tag", "How should I wash and dry this?"], disposal: ["disposal", "It hums but won't spin. How do I fix it?"],
   breaker: ["breaker panel", "Which breaker do I reset, and how?"], smoke: ["alarm", "It's chirping. How do I change the battery?"],
-  shutoff: ["valve", "How do I turn the water off here?"], toilet: ["toilet", "It's clogged. What do I do?"], other: ["thing", ""],
+  shutoff: ["valve", "How do I turn the water off here?"], toilet: ["toilet", "It's clogged. What do I do?"],
+  dashboard: ["dashboard light", "What does this light mean, and is it safe to drive?"], other: ["thing", ""],
 };
-const snapTargetFor = (id) => (id === "outage" ? "breaker" : SNAP[id] ? id : "other");
+const snapTargetFor = (id) => (id === "outage" ? "breaker" : ["oil", "tires", "jump"].includes(id) ? "dashboard" : SNAP[id] ? id : "other");
 function snapsLeft(){ const u = store.get("snaps", { day: "", n: 0 }); return Math.max(0, CONFIG.snapPerDay[tier()] - (u.day === todayStr() ? u.n : 0)); }
 function useSnap(){ const t = todayStr(), u = store.get("snaps", { day: t, n: 0 }); store.set("snaps", { day: t, n: (u.day === t ? u.n : 0) + 1 }); }
-const snapPromo = (t) => `<a class="snap-promo" href="#snap-${t}"><span class="ic">${ico("camera", 26)}</span><span><b>Every ${esc(SNAP[t][0])} is different</b><span class="small">Snap a photo of yours and get steps for your exact one.</span></span></a>`;
+const snapPromo = (t) => t === "dashboard"
+  ? `<a class="snap-promo" href="#snap-dashboard"><span class="ic">${ico("camera", 26)}</span><span><b>Light on your dashboard?</b><span class="small">Snap a photo and find out what it means and if it's safe to drive.</span></span></a>`
+  : `<a class="snap-promo" href="#snap-${t}"><span class="ic">${ico("camera", 26)}</span><span><b>Every ${esc(SNAP[t][0])} is different</b><span class="small">Snap a photo of yours and get steps for your exact one.</span></span></a>`;
 // Shrink a photo to at most 1280px on the long side so it uploads fast on a phone connection.
 function shrinkPhoto(file){
   return new Promise((resolve, reject) => {
@@ -463,7 +493,7 @@ function shrinkPhoto(file){
 function snapView(target){
   const t = SNAP[target] ? target : "other";
   let photo = null;
-  app.innerHTML = `<a class="back" href="${t === "other" ? "#ask" : `#g-${t === "breaker" ? "breaker" : t}`}">${ico("back", 18)} ${t === "other" ? "Ask" : "Back to the guide"}</a>
+  app.innerHTML = `<a class="back" href="${t === "other" ? "#ask" : t === "dashboard" ? "#m-car" : `#g-${t}`}">${ico("back", 18)} ${t === "other" ? "Ask" : t === "dashboard" ? "Car" : "Back to the guide"}</a>
   <section class="hello"><h1>Snap and Solve</h1><p class="muted">Take a clear photo of your ${esc(SNAP[t][0])}${t === "other" ? "" : "'s controls or label"}, close enough to read the words. You get steps for your exact one, marked right on your photo.</p></section>
   <section class="sec">
     <label class="f" for="snapWhat">What is it?<select id="snapWhat">${Object.keys(SNAP).map((k) => `<option value="${k}"${k === t ? " selected" : ""}>${esc(k === "other" ? "Something else" : SNAP[k][0][0].toUpperCase() + SNAP[k][0].slice(1))}</option>`).join("")}</select></label>
@@ -516,6 +546,114 @@ function snapResult(r, photo){
     <div class="foot"><span>AI answer from your photo. Check the labels on your machine.</span><button class="linkbtn" id="rep">Report this answer</button></div>
     <div id="repForm" hidden></div>
   </article>`;
+}
+
+/* ---------- Shopping list (saved on this device) ---------- */
+const shopList = () => { const l = store.get("shop", []); return Array.isArray(l) ? l : []; };
+function addToShop(items){
+  const list = shopList(), have = new Set(list.map((x) => x.n.toLowerCase()));
+  let added = 0;
+  for (const [n, amt] of items) { if (!have.has(n.toLowerCase())) { list.push({ n, a: amt || "", done: false }); have.add(n.toLowerCase()); added++; } }
+  store.set("shop", list);
+  return added;
+}
+function recipeCard(items, note){
+  return `<div class="card stack"><div class="sec-head"><h3>Ingredients</h3><span class="muted small">${esc(note)}</span></div>
+    <ul class="ingr">${items.map(([n, a]) => `<li><span>${esc(n)}</span><span class="muted">${esc(a)}</span></li>`).join("")}</ul>
+    <button class="btn blue full" id="toShop">${ico("list")} Add to shopping list</button></div>`;
+}
+function wireRecipe(items){
+  const b = $("#toShop"); if (!b) return;
+  b.onclick = () => { const n = addToShop(items); b.outerHTML = `<a class="btn ghost full" href="#shop">${ico("check")} ${n ? `Added ${n} item${n === 1 ? "" : "s"}. Open shopping list` : "Already on your list. Open it"}</a>`; };
+}
+function shopView(){
+  const list = shopList(), left = list.filter((x) => !x.done).length;
+  app.innerHTML = `<a class="back" href="#m-food">${ico("back", 18)} Food</a>
+  <section class="hello"><h1>Shopping list</h1><p class="muted">${list.length ? `${left} of ${list.length} left to buy` : "Add ingredients from any recipe, or type items below."}</p></section>
+  <section class="sec"><form class="addrow" id="addItem"><input type="text" id="newItem" maxlength="60" placeholder="Add an item, like milk" aria-label="Add an item"><button class="btn" type="submit">Add</button></form>
+    ${list.length ? `<div class="list">${list.map((x, i) => `<label class="check"><input type="checkbox" data-i="${i}"${x.done ? " checked" : ""}><span>${esc(x.n)}${x.a ? ` <span class="muted small">${esc(x.a)}</span>` : ""}</span></label>`).join("")}</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn ghost" id="clearDone">Remove checked items</button></div>` : ""}
+  </section>
+  <section class="sec"><a class="tool" href="#cook"><span class="ic">${ico("food", 26)}</span><span><b>Need ideas?</b><span class="small">Craving to Cart turns any food you love into a recipe and list.</span></span></a>
+    <p class="muted small">Ordering pickup or delivery from a store near you is coming soon.</p></section>`;
+  $("#addItem").onsubmit = (e) => { e.preventDefault(); const v = $("#newItem").value.trim(); if (v) { addToShop([[v, ""]]); shopView(); } };
+  document.querySelectorAll(".check input").forEach((box) => box.addEventListener("change", () => { const l = shopList(); l[+box.dataset.i].done = box.checked; store.set("shop", l); }));
+  const cd = $("#clearDone"); if (cd) cd.onclick = () => { store.set("shop", shopList().filter((x) => !x.done)); shopView(); };
+}
+
+/* ---------- Budget calculator: the 50/30/20 starting point ---------- */
+function budgetView(){
+  const saved = store.get("budget", {});
+  app.innerHTML = `<a class="back" href="#m-money">${ico("back", 18)} Money</a>
+  <section class="hello"><h1>Budget calculator</h1><p class="muted">A starting point using the 50/30/20 split. Adjust it to fit your life.</p></section>
+  <section class="sec form">
+    <label class="f">How often are you paid?<select id="bFreq"><option value="52">Every week</option><option value="26">Every two weeks</option><option value="24">Twice a month</option><option value="12">Once a month</option></select></label>
+    <label class="f">Take-home pay per paycheck ($)<input type="text" id="bPay" inputmode="decimal" placeholder="Example: 650" value="${esc(saved.pay || "")}"></label>
+    <label class="f">Rent per month ($, optional)<input type="text" id="bRent" inputmode="decimal" placeholder="Example: 900" value="${esc(saved.rent || "")}"></label>
+  </section>
+  <section class="sec" id="bOut" aria-live="polite"></section>
+  <section class="sec"><a class="btn ghost full" href="#g-budget">How to build a budget, step by step</a></section>`;
+  if (saved.freq) $("#bFreq").value = saved.freq;
+  const num = (v) => { const n = parseFloat(String(v).replace(/[^0-9.]/g, "")); return Number.isFinite(n) ? n : 0; };
+  const fmt = (n) => "$" + Math.round(n).toLocaleString("en-US");
+  const draw = () => {
+    const pay = num($("#bPay").value), freq = +$("#bFreq").value, rent = num($("#bRent").value);
+    store.set("budget", { pay: $("#bPay").value, freq: $("#bFreq").value, rent: $("#bRent").value });
+    if (!pay) { $("#bOut").innerHTML = `<div class="card"><p class="muted">Type your take-home pay above to see your budget.</p></div>`; return; }
+    const month = pay * freq / 12, needs = month * .5, wants = month * .3, save = month * .2;
+    const rentPct = rent ? Math.round(rent / month * 100) : 0;
+    $("#bOut").innerHTML = `<div class="card stack">
+      <div class="sec-head"><h3>Your monthly take-home</h3><b class="big-num">${fmt(month)}</b></div>
+      <div class="split"><span style="flex:50;background:var(--card)"></span><span style="flex:30;background:var(--amber)"></span><span style="flex:20;background:#7FB2E5"></span></div>
+      <div class="pricelist"><div><span><b>Needs (50%)</b><br><span class="small muted">Rent, utilities, groceries, insurance, minimum payments</span></span><b>${fmt(needs)}</b></div>
+        <div><span><b>Wants (30%)</b><br><span class="small muted">Eating out, subscriptions, fun</span></span><b>${fmt(wants)}</b></div>
+        <div><span><b>Savings and debt (20%)</b><br><span class="small muted">Emergency fund, extra debt payments, investing</span></span><b>${fmt(save)}</b></div></div>
+      ${rent ? `<div class="warn${rentPct > 50 ? " red" : ""}">${ico(rentPct > 35 ? "sos" : "check", 20)}<span>Rent is ${rentPct}% of your take-home pay. ${rentPct <= 30 ? "That's in a comfortable range." : rentPct <= 50 ? "That's on the high side, so keep wants low to stay on track." : "That's more than half your pay, which leaves very little for everything else. A roommate or cheaper place would help a lot."}</span></div>` : ""}
+      <p class="muted small">Save ${fmt(save / (freq / 12))} from each paycheck to hit your 20%.</p></div>`;
+  };
+  ["bPay", "bRent"].forEach((i) => $("#" + i).addEventListener("input", draw)); $("#bFreq").addEventListener("change", draw);
+  draw();
+}
+
+/* ---------- Craving to Cart: any food you love, as a simple recipe and a shopping list ---------- */
+function cookView(){
+  app.innerHTML = `<a class="back" href="#m-food">${ico("back", 18)} Food</a>
+  <section class="hello"><h1>Craving to Cart</h1><p class="muted">Name a food you love, even if you have no idea what goes in it. You get a simple recipe for your kitchen and a shopping list.</p></section>
+  <section class="sec form">
+    <label class="f">What are you craving?<input type="text" id="cDish" maxlength="80" placeholder="Example: chicken parm, or my mom's taco night"></label>
+    <div class="two" style="grid-template-columns:repeat(2,minmax(0,1fr))">
+      <label class="f">Servings<select id="cServe"><option>1</option><option selected>2</option><option>4</option><option>6</option></select></label>
+      <label class="f">Your kitchen<select id="cKit"><option value="full">Stove and oven</option><option value="stove">Stove only</option><option value="micro">Microwave only</option></select></label>
+    </div>
+    <button class="btn blue full" id="cGo">${ico("food")} Make my recipe</button>
+    <p class="meter" id="cMeter"></p>
+  </section>
+  <section class="sec" id="cOut" aria-live="polite"></section>`;
+  const meter = () => { $("#cMeter").innerHTML = tier() === "gold" ? "Unlimited on Gold." : `Uses an Ask Anything question. ${asksLeft()} left today. <a href="#plans">Get more</a>`; };
+  meter();
+  $("#cGo").onclick = async () => {
+    const dish = $("#cDish").value.trim(), out = $("#cOut"), go = $("#cGo");
+    if (dish.length < 2) { out.innerHTML = `<p class="err">Type a food first.</p>`; return; }
+    if (!asksLeft()) { out.innerHTML = outOfAsks(); return; }
+    go.disabled = true;
+    out.innerHTML = `<div class="card" style="display:flex;gap:12px;align-items:center"><span class="spin"></span><span>Writing your recipe…</span></div>`;
+    try {
+      const r = await aiCall("recipe", { dish, servings: $("#cServe").value, kitchen: $("#cKit").value });
+      useAsk(); meter();
+      if (!r.items.length) { out.innerHTML = `<div class="card"><p>${esc(r.summary || "Try naming a specific food or dish.")}</p></div>`; return; }
+      out.innerHTML = `<article class="answer"><h2>${esc(r.title)}</h2>
+        <div class="chips"><span class="chip">Serves ${r.serves}</span>${r.time ? `<span class="chip">${esc(r.time)}</span>` : ""}${r.cost ? `<span class="chip">${esc(r.cost)}</span>` : ""}</div>
+        ${r.summary ? `<p style="font-size:18px">${esc(r.summary)}</p>` : ""}
+        ${recipeCard(r.items.map((x) => [x.n, x.a]), "Check your pantry first")}
+        <h3>Steps</h3><ol>${r.steps.map((s) => `<li><span><b>${esc(s.t)}</b>${esc(s.d)}</span></li>`).join("")}</ol>
+        ${r.safety ? `<div class="warn">${ico("sos", 20)}<span>${esc(r.safety)}</span></div>` : ""}
+        <div class="foot"><span>AI recipe. Check that meat reaches a safe temperature.</span><button class="linkbtn" id="rep">Report this answer</button></div><div id="repForm" hidden></div></article>`;
+      wireRecipe(r.items.map((x) => [x.n, x.a]));
+      wireReport({ title: r.title, summary: r.summary, steps: r.steps, safety: r.safety, pro: "" }, "recipe");
+    } catch (e) {
+      out.innerHTML = `<p class="err">${esc(ERRS[e && e.code] || ERRS.upstream)}</p>`;
+    } finally { go.disabled = false; }
+  };
 }
 
 /* ---------- Ask Anything ---------- */
@@ -780,7 +918,7 @@ const TABS = [["", "home", "Home"], ["learn", "book", "Learn"], ["ask", "chat", 
 function drawTabs(h){
   const g = h.startsWith("g-") ? GUIDES[h.slice(2)] : null;
   const kit = h.startsWith("list-") && CHECKLISTS[h.slice(5)] && CHECKLISTS[h.slice(5)].kit;
-  const active = h.startsWith("snap-") ? "ask" : kit ? "help" : h === "learn" || h.startsWith("m-") || h.startsWith("list-") ? "learn" : h === "ask" ? "ask" : h === "help" || (g && g.urgent) ? "help" : h === "me" || h === "plans" ? "me" : g ? "learn" : "";
+  const active = h.startsWith("snap-") ? "ask" : ["shop", "budget", "cook"].includes(h) ? "learn" : kit ? "help" : h === "learn" || h.startsWith("m-") || h.startsWith("list-") ? "learn" : h === "ask" ? "ask" : h === "help" || (g && g.urgent) ? "help" : h === "me" || h === "plans" ? "me" : g ? "learn" : "";
   $("#tabs").innerHTML = TABS.map(([k, ic, l]) => `<a href="#${k}"${k === "help" ? ' class="sos"' : ""}${k === active ? ' aria-current="page"' : ""}>${ico(ic, 24)}<span>${l}</span></a>`).join("");
   $("#planChip").textContent = tierName();
 }
@@ -791,6 +929,9 @@ function route(){
   else if (h.startsWith("m-")) moduleView(h.slice(2));
   else if (h.startsWith("list-")) checklistView(h.slice(5));
   else if (h.startsWith("snap-")) snapView(h.slice(5));
+  else if (h === "shop") shopView();
+  else if (h === "budget") budgetView();
+  else if (h === "cook") cookView();
   else if (h === "learn") learnView();
   else if (h === "ask") askView();
   else if (h === "help") helpView();
