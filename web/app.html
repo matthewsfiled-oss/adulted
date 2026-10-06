@@ -73,6 +73,10 @@ p{margin:0}
 .sos-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
 .sos-grid a{display:flex;gap:10px;align-items:center;background:var(--card);border:2px solid var(--red);border-radius:12px;padding:10px;text-decoration:none;color:var(--ink);font-weight:700;font-size:15.5px;line-height:1.2}
 .sos-grid .ic{flex:none;width:34px;height:34px;border-radius:50%;background:var(--red);color:#fff;display:grid;place-items:center}
+.stand .bar{position:relative;height:30px;background:var(--paper);border:1.5px solid var(--line);border-radius:8px;overflow:hidden}
+.stand .bar span{display:block;height:100%;background:var(--amber)}
+.stand .bar b{position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:15px}
+.stand .src{font-size:12.5px;color:var(--muted)}
 .tip{background:var(--amber-soft);border-left:6px solid var(--amber);border-radius:4px 12px 12px 4px;padding:14px 16px;display:flex;gap:12px;align-items:flex-start}
 .tip b{display:block;font-size:14px;color:var(--amber-ink)}
 
@@ -98,7 +102,7 @@ p{margin:0}
 
 /* status chips */
 .chips{display:flex;gap:6px;flex-wrap:wrap}
-.chip{font-size:14px;font-weight:700;padding:4px 10px;border-radius:999px;background:var(--card);border:1.5px solid var(--line);display:inline-flex;align-items:center;gap:6px}
+.chip{white-space:nowrap;font-size:14px;font-weight:700;padding:4px 10px;border-radius:999px;background:var(--card);border:1.5px solid var(--line);display:inline-flex;align-items:center;gap:6px}
 .chip.l1{background:var(--green-soft);border-color:transparent;color:var(--green)}
 .chip.l2{background:var(--amber-soft);border-color:transparent;color:var(--amber-ink)}
 .chip.l3{background:var(--red-soft);border-color:transparent;color:var(--red)}
@@ -329,6 +333,7 @@ function homeView(){
     </div></section>
     ${rec.length ? `<section class="sec"><div class="sec-head"><h2>Pick up where you left off</h2></div><div class="list">${rec.slice(0, 2).map(guideRow).join("")}</div></section>` : ""}
     <section class="sec"><div class="tip">${ico("bulb", 24)}<p><b>Tip</b>${esc(tip)}</p></div></section>
+    ${standSection(true)}
     <section class="sec"><a class="murphy" href="#help"><span class="score">${readyScore()}<small>/100</small></span><span><h3>Murphy's Law</h3><span class="small">Anything that can go wrong will go wrong. See your Ready score and what to keep around.</span></span></a></section>
     <section class="sec"><div class="sec-head"><h2>Your first apartment</h2><a href="#list-apartment">Open checklist</a></div>
       <a class="card stack" href="#list-apartment" style="text-decoration:none;color:inherit"><p>${done ? `${done} of ${total} done. Keep going.` : "Everything to do before you sign, on move-in day, and in your first month."}</p><div class="progress"><span style="width:${Math.round(done / total * 100)}%"></span></div></a>
@@ -565,21 +570,70 @@ function checklistView(id){
   }));
 }
 
+/* ---------- Where you stand: you compared with people your age ---------- */
+function standItems(){
+  const age = +PROFILE.age, out = [];
+  if (!age) return out;
+  const home = benchmark("home", age);
+  if (home && PROFILE.living) {
+    const atHome = PROFILE.living === "With family";
+    out.push({ key: "home", b: home, you: atHome, label: "Live with their parents", youTxt: atHome ? "You live at home" : "You have your own place",
+      msg: atHome
+        ? (home.pct >= 40
+          ? `You're in good company: ${Math.round(home.pct)}% of people ${home.range} live with their parents. Living at home can be a smart way to save. When you're ready, start planning your move.`
+          : `Most people ${home.range} have their own place. Only ${Math.round(home.pct)}% still live with their parents. Saving up at home is smart, and when you're ready to make the jump, here's where to start.`)
+        : `You did it. You're on your own, while ${Math.round(home.pct)}% of people ${home.range} still live with their parents.`,
+      act: atHome ? ["#list-apartment", "Plan my move"] : null, nudge: atHome && home.pct < 40 });
+  }
+  const lic = benchmark("license", age);
+  if (lic && PROFILE.license) {
+    const has = PROFILE.license === "Yes";
+    out.push({ key: "license", b: lic, you: has, label: "Have a driver's license", youTxt: has ? "You have one" : "Not yet",
+      msg: has ? `You're with the ${Math.round(lic.pct)}% of people ${lic.range} who can drive.`
+        : `${Math.round(lic.pct)}% of people ${lic.range} have a driver's license. Ask Anything can walk you through getting yours${PROFILE.state ? ` in ${PROFILE.state}` : ""}.`,
+      act: has ? null : ["#ask", "How do I get my license?"], draft: `What are the steps to get my driver's license${PROFILE.state ? ` in ${PROFILE.state}` : ""}?`, nudge: !has && lic.pct >= 50 });
+  }
+  return out;
+}
+function standCard(it){
+  const pct = Math.round(it.b.pct);
+  return `<div class="card stand stack">
+    <div class="sec-head"><h3>${esc(it.label)}</h3><span class="chip">Ages ${esc(it.b.range)}</span></div>
+    <div class="bar" role="img" aria-label="${pct}% of people ages ${esc(it.b.range)}"><span style="width:${pct}%"></span><b>${pct}%</b></div>
+    <p class="small"><b>${esc(it.youTxt)}.</b> ${esc(it.msg)}</p>
+    ${it.act ? `<a class="btn ghost full" href="${it.act[0]}" data-draft="${esc(it.draft || "")}">${esc(it.act[1])}</a>` : ""}
+    <p class="src">Source: ${esc(BENCHMARKS[it.key].source)}</p></div>`;
+}
+function standSection(homeOnly){
+  const items = standItems();
+  if (homeOnly) {
+    const it = items.find((x) => x.nudge);
+    return it ? `<section class="sec"><div class="sec-head"><h2>Where you stand</h2><a href="#me">See all</a></div>${standCard(it)}</section>` : "";
+  }
+  if (!items.length) return `<section class="sec"><h2>Where you stand</h2><div class="card"><p class="muted small">Add your age, where you live, and whether you drive below to see how you compare with people your age.</p></div></section>`;
+  return `<section class="sec"><h2>Where you stand</h2><p class="muted small">Everyone moves at their own pace. This shows where most people your age are, so you can decide what's next.</p>${items.map(standCard).join("")}</section>`;
+}
+document.addEventListener("click", (e) => { const a = e.target.closest && e.target.closest("a[data-draft]"); if (a && a.dataset.draft) store.set("draft", a.dataset.draft); });
+
 /* ---------- Me: profile and progress ---------- */
 const STATES = ["Alabama","Alaska","Arizona","Arkansas","California","Colorado","Connecticut","Delaware","District of Columbia","Florida","Georgia","Hawaii","Idaho","Illinois","Indiana","Iowa","Kansas","Kentucky","Louisiana","Maine","Maryland","Massachusetts","Michigan","Minnesota","Mississippi","Missouri","Montana","Nebraska","Nevada","New Hampshire","New Jersey","New Mexico","New York","North Carolina","North Dakota","Ohio","Oklahoma","Oregon","Pennsylvania","Rhode Island","South Carolina","South Dakota","Tennessee","Texas","Utah","Vermont","Virginia","Washington","West Virginia","Wisconsin","Wyoming"];
 const LIVING = ["Dorm", "Apartment", "House", "With family", "Other"];
+const LICENSE = ["Yes", "Learner's permit", "Not yet"];
 const STAGES = ["High school senior", "College student", "First job", "Moving out soon", "Just moved", "Other"];
 const opts = (list, v) => `<option value="">Choose one</option>` + list.map((x) => `<option${x === v ? " selected" : ""}>${esc(x)}</option>`).join("");
 function meView(){
   const p = PROFILE;
   app.innerHTML = `<section class="hello"><h1>Me</h1></section>
+  ${standSection(false)}
   <section class="sec"><div class="card lvl"><span class="big">${DONE.length}</span><span><h3>Skills learned</h3><span class="muted small">${DONE.length ? "Finish a guide and tap I did it to add more." : "Finish any guide and tap I did it to start your count."}</span></span></div></section>
   <section class="sec"><div class="sec-head"><h2>About you</h2></div>
     <p class="muted small">This makes answers fit your life, like your state's rules or your exact car. It stays on this device.</p>
     <form class="form" id="pf">
       <label class="f">First name<input type="text" name="name" maxlength="30" value="${esc(p.name || "")}" autocomplete="given-name"></label>
       <label class="f">State<select name="state">${opts(STATES, p.state)}</select></label>
+      <label class="f">Age<input type="text" name="age" inputmode="numeric" maxlength="2" value="${esc(p.age || "")}"></label>
       <label class="f">Where you live<select name="living">${opts(LIVING, p.living)}</select></label>
+      <label class="f">Driver's license<select name="license">${opts(LICENSE, p.license)}</select></label>
       <label class="f">Right now you're<select name="stage">${opts(STAGES, p.stage)}</select></label>
       <fieldset style="border:0;padding:0;margin:0" class="stack"><legend class="f" style="font-weight:700;font-size:15.5px;margin-bottom:6px">Your car (optional)</legend>
         <div class="two"><input type="text" name="carYear" inputmode="numeric" maxlength="4" placeholder="Year" aria-label="Car year" value="${esc(p.carYear || "")}"><input type="text" name="carMake" maxlength="20" placeholder="Make" aria-label="Car make" value="${esc(p.carMake || "")}"><input type="text" name="carModel" maxlength="24" placeholder="Model" aria-label="Car model" value="${esc(p.carModel || "")}"></div></fieldset>
@@ -597,7 +651,8 @@ function meView(){
     const f = new FormData(e.target), next = {};
     for (const [k, v] of f.entries()) { const t = String(v).trim(); if (t) next[k] = t; }
     if (next.carYear && !/^(19|20)\d{2}$/.test(next.carYear)) delete next.carYear;
-    PROFILE = next; store.set("profile", PROFILE); toast("Saved");
+    if (next.age && !(+next.age >= 13 && +next.age <= 99)) delete next.age;
+    PROFILE = next; store.set("profile", PROFILE); toast("Saved"); meView();
   });
   $("#wipe").onclick = () => { $("#wipeAsk").hidden = false; $("#wipe").hidden = true; };
   $("#wipeNo").onclick = () => { $("#wipeAsk").hidden = true; $("#wipe").hidden = false; };

@@ -366,6 +366,20 @@
     { n: "National Domestic Violence Hotline", num: "1-800-799-7233", note: "Free and confidential, any time" },
   ];
 
+  /* Where you stand: how the user compares with people their age. Real data only, with its source.
+     Living with parents counts college dorms as living at home, the way the Census does. */
+  const BENCHMARKS = {
+    home: {
+      n: "Live with their parents", source: "U.S. Census Bureau, Current Population Survey, 2023 (via Bowling Green State University NCFMR)",
+      byAge: [[18, 24, 57.1], [25, 29, 21.7], [30, 34, 12.1]],
+    },
+    license: {
+      n: "Have a driver's license", source: "Federal Highway Administration, Highway Statistics 2024, table DL-20",
+      byAge: [[16, 16, 26.2], [17, 17, 44.4], [18, 18, 60.4], [19, 19, 68.8], [20, 24, 80.9], [25, 29, 89.3], [30, 34, 89.7]],
+    },
+  };
+  const benchmark = (key, age) => { const b = BENCHMARKS[key]; const r = b && b.byAge.find(([lo, hi]) => age >= lo && age <= hi); return r ? { pct: r[2], range: r[0] === r[1] ? `${r[0]}` : `${r[0]} to ${r[1]}` } : null; };
+
   /* Life-moment checklist */
   const CHECKLISTS = {
     apartment: {
@@ -430,5 +444,5 @@
   ];
   const dayIndex = (ymd, n) => { const [y, m, d] = String(ymd).split("-").map(Number); return Math.floor(Date.UTC(y, m - 1, d) / 864e5) % n; };
 
-  return { CONFIG, TIERS, ONE_TIME, TOPUPS, MODULES, GUIDES, PANIC, READY, RESOURCES, CHECKLISTS, TIPS, dayIndex };
+  return { CONFIG, TIERS, ONE_TIME, TOPUPS, MODULES, GUIDES, PANIC, READY, BENCHMARKS, benchmark, RESOURCES, CHECKLISTS, TIPS, dayIndex };
 });

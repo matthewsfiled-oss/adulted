@@ -47,3 +47,11 @@ test("Murphy's Law section points at real guides and kits", () => {
   for (const id of D.READY.kits) assert.ok(D.CHECKLISTS[id] && D.CHECKLISTS[id].kit, id);
   for (const id of D.READY.stepin) assert.ok(D.GUIDES[id].steps.some((s) => /911/.test(s.t + s.d)), `${id} must tell people to call 911`);
 });
+
+test('age comparisons find the right group and stay in range', () => {
+  assert.equal(D.benchmark('home', 22).pct, 57.1);
+  assert.equal(D.benchmark('home', 27).range, '25 to 29');
+  assert.equal(D.benchmark('home', 17), null);
+  assert.equal(D.benchmark('license', 18).pct, 60.4);
+  for (const b of Object.values(D.BENCHMARKS)) for (const [lo, hi, pct] of b.byAge) assert.ok(lo <= hi && pct > 0 && pct < 100 && b.source);
+});
