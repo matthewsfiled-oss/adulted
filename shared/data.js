@@ -78,7 +78,7 @@
         { t: "Check for no-dryer items", d: "Leave out anything with a line-dry tag, rubber-backed rugs, and clothes with oil or gas stains.", v: "label" },
         { t: "Don't overfill", d: "Fill it about halfway. Clothes need room to tumble.", v: "load" },
         { t: "Pick the heat", d: "Low heat for workout clothes and anything stretchy. Normal or high for towels and jeans.", v: "dial" },
-        { t: "Take clothes out right away", d: "Fold or hang them while they're warm to cut down on wrinkles.", v: "timer" },
+        { t: "Take clothes out right away", d: "Fold or hang them while they're warm to cut down on wrinkles.", v: "timer", img: "dryer-5.jpg", alt: "A hand pulling clean clothes out of the drum" },
       ],
       pro: "If clothes still come out damp after a full cycle, the vent may be clogged. Tell your landlord, since a blocked vent is a fire risk.",
       related: ["laundry", "labels"],
