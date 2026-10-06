@@ -56,7 +56,7 @@ Expo creates and stores this app's signing key on the first build, so there's no
 - Privacy policy URL: `https://adulted.onrender.com/privacy`
 - Google Play requires its own billing for Silver and Gold. When that's hooked up, set `paymentsLive: true` in `shared/data.js`. Until then the plans screen says "Opens soon."
 - Have someone check the guides (a plumber and an electrician for those guides), and have a mental health professional review the crisis wording in `shared/prompts.js`.
-- The step pictures are line drawings for now. Real photos or short videos can replace any of them: add `img` or `video` to a step in `shared/data.js`.
+- The step pictures are shaded illustrations, with real photos on some laundry steps. Real photos or short videos can replace any of them: add `img` or `video` to a step in `shared/data.js`.
 
 ---
 
