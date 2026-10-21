@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cottage sample booking | Saltbox Digital</title>
+<meta name="description" content="A Saltbox Digital sample: pick dates, see the deposit, and preview the guest guidebook and check-in text.">
+<link rel="canonical" href="https://saltboxdigital.netlify.app/work/rental">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/css/site.css">
+<link rel="stylesheet" href="/css/demos.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<div class="banner"><div class="wrap"><span>Sample build · Bayberry Cottage is fictional · no reservation is held</span><a href="/#work">All samples</a></div></div>
+<header class="top">
+  <div class="wrap">
+    <a class="logo" href="/" aria-label="Saltbox Digital home">
+      <svg viewBox="0 0 40 40" aria-hidden="true"><path d="M4 22 L18 8 L36 20 L36 34 L4 34 Z" fill="var(--ink)"/><rect x="15" y="24" width="6" height="10" fill="var(--accent)"/><rect x="25" y="23" width="6" height="5" fill="var(--bg)"/></svg>
+      Saltbox Digital
+    </a>
+    <nav aria-label="Main">
+      <a href="/#packages">Packages</a>
+      <a href="/#build">Build your quote</a>
+      <a href="/#work">Work</a>
+      <a href="/#contact">Contact</a>
+    </nav>
+  </div>
+</header>
+<main id="content" class="page">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">Bayberry Cottage · West Falmouth</span>
+      <h1>Book direct. Skip the platform fee.</h1>
+      <p>$280 a night, two-night minimum, half due to hold the dates. The rest of the stay is a guidebook and a check-in text.</p>
+    </div>
+    <div class="demo-grid">
+      <div class="panel">
+        <div class="cal-head">
+          <button class="btn" type="button" id="prevMonth" aria-label="Previous month">←</button>
+          <strong id="monthLabel"></strong>
+          <button class="btn" type="button" id="nextMonth" aria-label="Next month">→</button>
+        </div>
+        <div class="days" id="calendar"></div>
+        <p class="fine">Shaded dates are already taken in this sample. Choose a check-in day, then a check-out day.</p>
+        <label>Guest name<input id="guestName" type="text" autocomplete="name" placeholder="Sam"></label>
+        <button class="btn primary" type="button" id="reserve">Reserve with deposit</button>
+        <p id="stayStatus" class="status" role="status" hidden></p>
+      </div>
+      <aside class="panel" id="stayCard" aria-live="polite">
+        <span class="eyebrow">This stay</span>
+        <div class="cart-line"><span>Nights</span><strong id="nightCount">Select dates</strong></div>
+        <div class="cart-line"><span>Stay total</span><strong class="mono" id="stayTotal">$0</strong></div>
+        <div class="cart-line"><span>Deposit due now</span><strong class="mono" id="deposit">$0</strong></div>
+        <div id="guide" hidden class="confirm">
+          <strong>Guest guidebook</strong>
+          <p>Door code 4821. Parking is the crushed-shell spot on the left. Trash day is Thursday. Wifi is Bayberry / saltbox280, written on the fridge.</p>
+          <p id="checkinText"></p>
+        </div>
+      </aside>
+    </div>
+  </div>
+</main>
+<footer>
+  <div class="wrap">
+    <span>Sample by Saltbox Digital</span>
+    <a href="/#contact">Want this for your rental?</a>
+  </div>
+</footer>
+<script src="/js/rental.js"></script>
+</body>
+</html>

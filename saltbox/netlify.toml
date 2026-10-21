@@ -1,0 +1,42 @@
+# Publish this folder as the site root (base directory: saltbox).
+# After deploy, add saltboxdigital.com under Domain management and copy the
+# DNS records Netlify shows into the registrar. The domain currently points at
+# a parking server, so HTTPS never reaches this project.
+# Also turn off Project configuration > General > Powered by Netlify badge.
+# The Content-Security-Policy below blocks that badge if the setting is left on,
+# because the badge needs an inline script.
+
+[build]
+  publish = "."
+
+[build.processing.html]
+  pretty_urls = true
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=()"
+    Content-Security-Policy = "default-src 'self'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self' data:; connect-src 'self'; form-action 'self'; base-uri 'self'; frame-ancestors 'none'"
+
+[[redirects]]
+  from = "/favicon.ico"
+  to = "/favicon.svg"
+  status = 200
+
+[[headers]]
+  for = "/fonts/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/css/*"
+  [headers.values]
+    Cache-Control = "public, max-age=3600"
+
+[[headers]]
+  for = "/js/*"
+  [headers.values]
+    Cache-Control = "public, max-age=3600"

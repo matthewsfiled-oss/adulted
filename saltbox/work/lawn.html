@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Harbor Lawn sample booking | Saltbox Digital</title>
+<meta name="description" content="A Saltbox Digital sample: book weekly mowing, send a yard photo, and confirm the first visit.">
+<link rel="canonical" href="https://saltboxdigital.netlify.app/work/lawn">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/css/site.css">
+<link rel="stylesheet" href="/css/demos.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<div class="banner"><div class="wrap"><span>Sample build · Harbor Lawn is fictional · no payment is taken</span><a href="/#work">All samples</a></div></div>
+<header class="top">
+  <div class="wrap">
+    <a class="logo" href="/" aria-label="Saltbox Digital home">
+      <svg viewBox="0 0 40 40" aria-hidden="true"><path d="M4 22 L18 8 L36 20 L36 34 L4 34 Z" fill="var(--ink)"/><rect x="15" y="24" width="6" height="10" fill="var(--accent)"/><rect x="25" y="23" width="6" height="5" fill="var(--bg)"/></svg>
+      Saltbox Digital
+    </a>
+    <nav aria-label="Main">
+      <a href="/#packages">Packages</a>
+      <a href="/#build">Build your quote</a>
+      <a href="/#work">Work</a>
+      <a href="/#contact">Contact</a>
+    </nav>
+  </div>
+</header>
+<main id="content" class="page">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">Harbor Lawn · East Falmouth</span>
+      <h1>Weekly mowing, booked without a phone call.</h1>
+      <p>Pick a plan, tell us where the yard is, and send a photo so the crew knows what they're walking into.</p>
+    </div>
+    <div class="demo-grid">
+      <form class="panel" id="lawnForm">
+        <fieldset class="choice-row">
+          <legend class="eyebrow">Plan</legend>
+          <label class="choice"><input type="radio" name="plan" value="weekly" data-price="45" checked><span><strong>Weekly</strong><br><span class="quiet">Mow, edge, and blow. Same day each week.</span></span><b class="mono">$45</b></label>
+          <label class="choice"><input type="radio" name="plan" value="biweekly" data-price="55"><span><strong>Every other week</strong><br><span class="quiet">A fuller cut for yards that can wait.</span></span><b class="mono">$55</b></label>
+          <label class="choice"><input type="radio" name="plan" value="cleanup" data-price="180"><span><strong>One-time cleanup</strong><br><span class="quiet">Overgrown yard, leaves, or a spring reset.</span></span><b class="mono">$180</b></label>
+        </fieldset>
+        <div class="two">
+          <label>Street address<input id="street" name="street" type="text" required autocomplete="street-address" placeholder="18 Shore Rd"></label>
+          <label>Town
+            <select id="town" name="town">
+              <option>Falmouth</option><option>Mashpee</option><option>Barnstable</option><option>Yarmouth</option><option>Dennis</option><option>Bourne</option><option>Sandwich</option><option>Somewhere else</option>
+            </select>
+          </label>
+        </div>
+        <label>First visit<input id="visit" type="date" required></label>
+        <label>Yard photo<input id="photo" type="file" accept="image/*"></label>
+        <img id="preview" class="photo-preview" alt="">
+        <p id="areaNote" class="fine" hidden>This sample crew covers the Upper Cape. A real build would list your towns and refuse the rest.</p>
+        <button class="btn primary" type="submit">Confirm first visit</button>
+        <p id="lawnStatus" class="status" role="status" hidden></p>
+      </form>
+      <aside class="panel" id="lawnSummary" aria-live="polite">
+        <span class="eyebrow">First visit</span>
+        <div class="cart-line"><span>Plan</span><strong id="sumPlan">Weekly</strong></div>
+        <div class="cart-line"><span>Due today</span><strong class="mono" id="sumPrice">$45</strong></div>
+        <p class="fine">On a real site this button would take a card deposit through Stripe or Square. This demo only confirms the request on your screen.</p>
+      </aside>
+    </div>
+  </div>
+</main>
+<footer>
+  <div class="wrap">
+    <span>Sample by Saltbox Digital</span>
+    <a href="/#contact">Want this for your crew?</a>
+  </div>
+</footer>
+<script src="/js/lawn.js"></script>
+</body>
+</html>
