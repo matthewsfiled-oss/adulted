@@ -859,9 +859,76 @@ const LIVING = ["Dorm", "Apartment", "House", "With family", "Other"];
 const LICENSE = ["Yes", "Learner's permit", "Not yet"];
 const STAGES = ["High school senior", "College student", "First job", "Moving out soon", "Just moved", "Other"];
 const opts = (list, v) => `<option value="">Choose one</option>` + list.map((x) => `<option${x === v ? " selected" : ""}>${esc(x)}</option>`).join("");
+/* ---------- Account: email sign-up on Neon Auth (web app only; the server proxies /api/auth) ---------- */
+const ACCOUNTS = API === "/api";
+let ACCT_MODE = "up";
+async function authCall(path, body){
+  let res;
+  try { res = await fetch(`${API}/auth/${path}`, { method: "POST", credentials: "same-origin", headers: { "content-type": "application/json" }, body: JSON.stringify(body || {}) }); }
+  catch { throw new Error("Can't reach Adulted right now. Check your connection and try again."); }
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    const code = String(data.code || "").toUpperCase();
+    if (code.includes("INVALID_EMAIL_OR_PASSWORD") || res.status === 401) throw new Error("That email and password don't match. Check them and try again.");
+    if (code.includes("USER_ALREADY_EXISTS")) throw new Error("There's already an account with that email. Log in instead.");
+    if (code.includes("PASSWORD_TOO_SHORT")) throw new Error("Use a password with at least 8 characters.");
+    if (code.includes("EMAIL_NOT_VERIFIED")) throw new Error("Check your email for a verification code first.");
+    throw new Error(data.message || "Something went wrong. Try again.");
+  }
+  return data;
+}
+async function currentUser(){
+  try { const r = await fetch(`${API}/me`, { credentials: "same-origin" }); return r.ok ? (await r.json()).user : null; }
+  catch { return null; }
+}
+async function accountSection(){
+  const box = $("#acct"); if (!box) return;
+  const u = await currentUser();
+  if (!$("#acct")) return;
+  if (u) {
+    box.innerHTML = `<div class="card stack"><p><b>${esc(u.name || "Signed in")}</b><br><span class="muted small">${esc(u.email)}</span></p>
+      <p class="muted small">Your account is saved. Progress still lives on this device for now.</p>
+      <button class="btn ghost" id="acctOut" type="button">Log out</button></div>`;
+    $("#acctOut").onclick = async () => { try { await authCall("sign-out"); toast("Logged out"); } catch (e) { toast(e.message); } accountSection(); };
+    return;
+  }
+  accountForm();
+}
+function accountForm(){
+  const box = $("#acct"); if (!box) return;
+  const up = ACCT_MODE === "up";
+  const keep = { email: box.querySelector("[name=email]")?.value || "" };
+  box.innerHTML = `<form class="form" id="af" novalidate>
+      <div style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="btn${up ? "" : " ghost"}" data-am="up">Create account</button><button type="button" class="btn${up ? " ghost" : ""}" data-am="in">Log in</button></div>
+      ${up ? `<label class="f">Name<input type="text" name="name" maxlength="40" autocomplete="name" required></label>` : ""}
+      <label class="f">Email<input type="email" name="email" maxlength="120" autocomplete="email" required value="${esc(keep.email)}"></label>
+      <label class="f">Password<input type="password" name="password" minlength="8" maxlength="128" autocomplete="${up ? "new-password" : "current-password"}" required></label>
+      ${up ? `<p class="muted small">At least 8 characters.</p>` : ""}
+      <button class="btn" type="submit" id="acctGo">${up ? "Create account" : "Log in"}</button>
+      <p class="small" id="acctErr" role="alert" style="color:var(--red)" hidden></p></form>`;
+  box.querySelectorAll("[data-am]").forEach((b) => b.onclick = () => { ACCT_MODE = b.dataset.am; accountForm(); });
+  $("#af").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const f = Object.fromEntries(new FormData(e.target)), err = $("#acctErr"), go = $("#acctGo");
+    const email = String(f.email || "").trim().toLowerCase(), password = String(f.password || ""), name = String(f.name || "").trim();
+    const fail = (m) => { err.textContent = m; err.hidden = false; };
+    if (up && !name) return fail("Add your name.");
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return fail("Enter a valid email address.");
+    if (password.length < 8) return fail("Use a password with at least 8 characters.");
+    go.disabled = true; go.textContent = up ? "Creating account…" : "Logging in…";
+    try {
+      if (up) await authCall("sign-up/email", { name, email, password });
+      else await authCall("sign-in/email", { email, password });
+      toast(up ? "Account created" : "Logged in");
+      accountSection();
+    } catch (x) { fail(x.message); go.disabled = false; go.textContent = up ? "Create account" : "Log in"; }
+  });
+}
+
 function meView(){
   const p = PROFILE;
   app.innerHTML = `<section class="hello"><h1>Me</h1></section>
+  ${ACCOUNTS ? `<section class="sec"><div class="sec-head"><h2>Your account</h2></div><div id="acct"><p class="muted small">Loading…</p></div></section>` : ""}
   ${standSection(false)}
   <section class="sec"><div class="card lvl"><span class="big">${DONE.length}</span><span><h3>Skills learned</h3><span class="muted small">${DONE.length ? "Finish a guide and tap I did it to add more." : "Finish any guide and tap I did it to start your count."}</span></span></div></section>
   <section class="sec"><div class="sec-head"><h2>About you</h2></div>
@@ -884,6 +951,7 @@ function meView(){
   <section class="sec"><h2>Privacy</h2>
     <p class="muted small">Your profile, checklist, and progress stay on this device. When you use Ask Anything, your question and the profile details above (not your name) go to our server and Anthropic to write the answer. We don't store them.</p>
     <button class="btn ghost" id="wipe">Delete my data on this device</button><div id="wipeAsk" class="card stack" hidden><p>Delete your profile, checklist, and progress from this device? This can't be undone.</p><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" id="wipeYes" style="background:var(--red);border-color:var(--red)">Delete everything</button><button class="btn ghost" id="wipeNo">Keep my data</button></div></div></section>`;
+  if (ACCOUNTS) accountSection();
   $("#pf").addEventListener("submit", (e) => {
     e.preventDefault();
     const f = new FormData(e.target), next = {};

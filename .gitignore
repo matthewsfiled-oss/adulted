@@ -1,5 +1,8 @@
 node_modules/
 .env
+.env.local
+.env.*.local
+.neon
 .expo/
 dist/
 *.log
@@ -7,3 +10,4 @@ dist/
 server/web/
 server/data/
 app/credentials.json
+neon-auth-check.txt
