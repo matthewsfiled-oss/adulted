@@ -35,7 +35,7 @@ const SYSTEM = "You are Adulted's life-skills helper for young adults living on 
  */
 function createApp({
   client, models, adminKey = '', waitlist, reports, corsOrigin = true, dailyAiLimit = 1000,
-  publicDir, webDir, trustProxy = 1,
+  publicDir, webDir, trustProxy = 1, authRouter = null,
 }) {
   const app = express();
   app.disable('x-powered-by');
@@ -53,6 +53,8 @@ function createApp({
     crossOriginEmbedderPolicy: false,
   }));
   app.use('/api', cors({ origin: corsOrigin }));
+  // Accounts (Neon Auth). Mounted before the JSON parser: the proxy forwards raw bodies.
+  if (authRouter) app.use(authRouter);
   // Photos for Snap and Solve need room; everything else stays small.
   const smallJson = express.json({ limit: '64kb' });
   const photoJson = express.json({ limit: '5mb' });

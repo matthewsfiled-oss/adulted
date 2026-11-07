@@ -43,6 +43,19 @@ Admin downloads (your `ADMIN_KEY` is on the service's **Environment** tab):
 
 **Cost control:** each person is rate limited, and `DAILY_AI_LIMIT` (default 1,000) caps all AI calls per day. Free users get 3 Ask Anything questions a day inside the app (`askPerDay` in `shared/data.js`). Also set a monthly spend limit in the Anthropic Console.
 
+### Accounts (Neon Auth)
+
+Email-and-password sign-up runs on Neon Managed Better Auth, declared in `neon.ts` (`auth: true`).
+
+1. Install the Neon CLI (`npm install -g neon@latest`), then from this folder: `neon login`, `neon link --project-id red-brook-87125133 --branch production`.
+2. `npm install` (gets `@neon/config`), then `neon deploy`. It turns on Auth and writes `NEON_AUTH_BASE_URL` to `.env.local`.
+3. `cd server && npm ci && cd ..`, then `npm run check:auth`: signs up a fresh test user through the app and reads it back.
+4. On Render, set `NEON_AUTH_BASE_URL` (Render generates `NEON_AUTH_COOKIE_SECRET`).
+
+The web app's **Me** tab has Create account / Log in. The browser only talks to this server: `/api/auth/*` is proxied to Neon Auth (`server/src/auth.js`), and `/api/me` returns the signed-in user. The phone app doesn't show accounts yet. Before launch, set up your own email sender (custom SMTP) for password-reset and verification emails: https://neon.com/docs/auth/production-checklist.md
+
+Neon agent skills live in `.claude/skills` (`neon skills status` checks for updates). The Neon MCP server is in `.mcp.json` (OAuth, pinned to this project); Claude Code asks you to sign in to Neon the first time it's used.
+
 ### 4. Android app for testers
 
 **One-time setup:** in GitHub, go to **Settings > Secrets and variables > Actions > New repository secret** and add `EXPO_TOKEN` (expo.dev > your avatar > **Account settings > Access tokens**). You can reuse the Pathwise token.

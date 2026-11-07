@@ -5,7 +5,13 @@
   "scripts": {
     "build": "node scripts/build-web.js && cd server && npm ci --omit=dev",
     "start": "cd server && npm start",
-    "test": "node scripts/build-web.js --check && cd shared && npm test && cd ../server && npm test"
+    "test": "node scripts/build-web.js --check && cd shared && npm test && cd ../server && npm test",
+    "check:auth": "node scripts/check-neon-auth.js"
   },
-  "engines": { "node": ">=20" }
+  "engines": {
+    "node": ">=20"
+  },
+  "devDependencies": {
+    "@neon/config": "^1.12.0"
+  }
 }

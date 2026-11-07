@@ -1,9 +1,11 @@
-require('dotenv').config();
 const path = require('path');
+// server/.env first, then the repo-root .env.local that `neon deploy` / `neon env pull` writes.
+require('dotenv').config({ path: [path.join(__dirname, '..', '.env'), path.join(__dirname, '..', '..', '.env.local')], quiet: true });
 const Anthropic = require('@anthropic-ai/sdk');
 const { createApp } = require('./app');
 const { createWaitlistStore } = require('./waitlist');
 const { createReportStore } = require('./reports');
+const { createAuthRouter } = require('./auth');
 
 if (!process.env.ANTHROPIC_API_KEY) {
   console.error('Missing ANTHROPIC_API_KEY. Copy .env.example to .env and paste your key.');
@@ -25,6 +27,13 @@ if (!process.env.ADMIN_KEY) {
   console.warn('No ADMIN_KEY set: the signup download link is turned off.');
 }
 
+(async () => {
+const authRouter = await createAuthRouter({
+  baseUrl: process.env.NEON_AUTH_BASE_URL || '',
+  cookieSecret: process.env.NEON_AUTH_COOKIE_SECRET || '',
+});
+if (!authRouter) console.warn('No NEON_AUTH_BASE_URL set: account sign-up is turned off.');
+
 const app = createApp({
   client: new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY }),
   adminKey: process.env.ADMIN_KEY || '',
@@ -32,6 +41,7 @@ const app = createApp({
   reports,
   corsOrigin: process.env.CORS_ORIGIN || true,
   dailyAiLimit: Number(process.env.DAILY_AI_LIMIT) || 1000,
+  authRouter,
   publicDir: path.join(__dirname, '..', 'public'),
   webDir: path.join(__dirname, '..', 'web'),
   models: {
@@ -44,3 +54,4 @@ const port = Number(process.env.PORT) || 3001;
 app.listen(port, '0.0.0.0', () => {
   console.log(`Adulted running on port ${port}  (website: /, app: /app, API: /api)`);
 });
+})().catch((e) => { console.error('Startup failed:', e && e.message); process.exit(1); });

@@ -17,5 +17,9 @@ services:
         sync: false
       - key: ADMIN_KEY
         generateValue: true
+      - key: NEON_AUTH_BASE_URL
+        sync: false
+      - key: NEON_AUTH_COOKIE_SECRET
+        generateValue: true
       - key: DAILY_AI_LIMIT
         value: "1000"
